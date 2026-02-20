@@ -9,13 +9,8 @@ import {
   Legend,
 } from 'recharts';
 import type { DailySettlement } from '@/data/settlement.dummy';
-
-const COLORS: Record<string, string> = {
-  카드: '#3b82f6',
-  현금: '#10b981',
-  포인트: '#f59e0b',
-  기타: '#8b5cf6',
-};
+import { PAYMENT_COLORS, PAYMENT_COLOR_FALLBACK } from '@/utils/chartColors';
+import { TOOLTIP_PROPS } from '@/components/charts/ChartTooltip';
 
 interface PaymentStackBarChartProps {
   dailyTrend: DailySettlement[];
@@ -46,6 +41,7 @@ export default function PaymentStackBarChart({
         <XAxis dataKey="date" tick={{ fontSize: 11 }} interval={4} />
         <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12 }} width={60} />
         <Tooltip
+          {...TOOLTIP_PROPS}
           formatter={(value: number, name: string) => [
             value.toLocaleString('ko-KR') + '원',
             name,
@@ -57,7 +53,7 @@ export default function PaymentStackBarChart({
             key={name}
             dataKey={name}
             stackId="payment"
-            fill={COLORS[name] ?? '#94a3b8'}
+            fill={PAYMENT_COLORS[name] ?? PAYMENT_COLOR_FALLBACK}
             radius={name === paymentNames[paymentNames.length - 1] ? [4, 4, 0, 0] : undefined}
           />
         ))}

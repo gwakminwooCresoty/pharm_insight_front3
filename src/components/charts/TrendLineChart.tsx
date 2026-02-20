@@ -10,6 +10,7 @@ import {
   Legend,
 } from 'recharts';
 import type { TrendPoint } from '@/data/pos.dummy';
+import { TOOLTIP_PROPS } from '@/components/charts/ChartTooltip';
 
 interface TrendLineChartProps {
   data: TrendPoint[];
@@ -33,6 +34,7 @@ export default function TrendLineChart({
         <XAxis dataKey="axis" tick={{ fontSize: 12 }} />
         <YAxis tickFormatter={formatYAxis} tick={{ fontSize: 12 }} width={60} />
         <Tooltip
+          {...TOOLTIP_PROPS}
           formatter={(value: number, name: string) => [
             value.toLocaleString('ko-KR') + '원',
             name === 'sales' ? '매출액' : name === 'compareSales' ? '비교기간' : name,

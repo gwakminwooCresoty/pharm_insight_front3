@@ -5,6 +5,16 @@
 
 ---
 
+## 0. Claude 작업 규칙
+
+> **이 섹션은 Claude(AI 어시스턴트)를 위한 지시사항입니다.**
+
+- **CLAUDE.md 자동 갱신**: 코드·구조·설계 결정을 변경할 때마다 이 파일을 즉시 갱신한다. 사용자가 별도로 요청하지 않아도 자동으로 수행한다.
+- 갱신 범위: 신규 파일 추가 → 섹션 3(파일 구조), API 변경 → 섹션 12, 설계 결정 추가 → 섹션 13, 페이지 로직 변경 → 섹션 10.
+- 갱신 시점: 해당 변경 작업 완료 직후 (별도 커밋 불필요, 파일 수정만).
+
+---
+
 ## 1. 기술 스택
 
 | 구분 | 스택 | 비고 |
@@ -88,6 +98,7 @@ src/
 ├── utils/
 │   ├── permissions.ts         # ROLE_LABELS, hasPermission(), canAccessMenu(), shouldShowStoreSelector()
 │   ├── formatters.ts          # formatKRW(), formatNumber(), formatRatio(), formatDate(), formatDateTime()
+│   ├── chartColors.ts         # 차트 공용 색상 상수 (PAYMENT_COLOR_LIST, PAYMENT_COLORS, FRANCHISE_RANK_COLORS)
 │   └── dummy.helpers.ts       # paginateArray<T>() — Spring Page 규칙 (0-based)
 │
 ├── router/
@@ -119,10 +130,11 @@ src/
 │   │   └── MultiSelect.tsx    # 체크박스 드롭다운, "전체" 옵션 포함
 │   │
 │   └── charts/
+│       ├── ChartTooltip.ts          # TOOLTIP_PROPS 공용 객체 — 모든 차트 Tooltip에 스프레드
 │       ├── TrendLineChart.tsx       # ComposedChart: Bar(매출) + Line(비교기간)
-│       ├── PaymentDonutChart.tsx    # PieChart innerRadius=70, outerRadius=110
+│       ├── PaymentDonutChart.tsx    # PieChart innerRadius=70, outerRadius=105, 중앙 합계 CSS overlay
 │       ├── PaymentStackBarChart.tsx # BarChart stackId="payment" 결제수단별
-│       └── FranchiseRankBarChart.tsx# 수평 BarChart 프랜차이즈 랭킹
+│       └── FranchiseRankBarChart.tsx# BarChart 프랜차이즈 랭킹, height=280, XAxis angle=-25°
 │
 └── pages/
     ├── LoginPage.tsx              # 테넌트 로그인 (/login): BRANDING 적용, PLATFORM_ADMIN 제외
@@ -270,6 +282,31 @@ formatDateTime(string)  // 'T' → ' '
 paginateArray<T>(items, page, size): PageResult<T>
 // page: 0-based (Spring Pageable 규칙)
 // 반환: { content, totalElements, totalPages, numberOfElements, first, last, pageNumber, pageSize }
+```
+
+### chartColors.ts
+```ts
+// 결제수단 도넛/스택바 공용 색상
+PAYMENT_COLOR_LIST: readonly string[]            // 인덱스 기반 (도넛 Cell)
+PAYMENT_COLORS: Record<string, string>           // 이름 기반 { 카드, 현금, 포인트, 기타 }
+PAYMENT_COLOR_FALLBACK: string                   // 매핑 없을 때 기본색
+
+// 프랜차이즈 랭킹 바차트
+FRANCHISE_RANK_COLORS: readonly string[]         // 8색 블루~인디고 계열
+```
+
+### ChartTooltip.ts (컴포넌트 아님, 상수 파일)
+```ts
+// 모든 recharts <Tooltip>에 스프레드해서 사용
+import { TOOLTIP_PROPS } from '@/components/charts/ChartTooltip';
+<Tooltip {...TOOLTIP_PROPS} formatter={...} />
+// 또는 개별 props만 꺼내기 (cursor 제외 시):
+<Tooltip
+  contentStyle={TOOLTIP_PROPS.contentStyle}
+  labelStyle={TOOLTIP_PROPS.labelStyle}
+  itemStyle={TOOLTIP_PROPS.itemStyle}
+  formatter={...}
+/>
 ```
 
 ---
@@ -481,3 +518,22 @@ src/data/auth.dummy.ts      → POST /api/auth/login (JWT 반환)
 7. **브랜딩 설정 (`branding.dummy.ts`)**: `serviceName`과 `loginTagline`은 한 파일만 수정하면 LoginPage·Sidebar·브라우저 탭 전체 반영. `loginTagline`에는 조사(을/를)를 포함해 직접 작성 (예: `'슈퍼팜을 위한'`). `App.tsx`에서 `document.title = BRANDING.serviceName`으로 런타임 탭 제목 설정.
 
 8. **플랫폼 관리자 로그인 분리**: `PLATFORM_ADMIN`은 `/platform/login`(PlatformLoginPage)에서만 인증. 일반 `/login`에서 PLATFORM_ADMIN credentials 입력 시 거부 메시지 표시. `PrivateRoute`는 `/platform/*` 경로 미인증 접근 시 `/platform/login`으로 분기.
+
+9. **차트 색상 공유 패턴**: 결제수단 관련 차트(DonutChart, StackBarChart)는 `chartColors.ts`의 `PAYMENT_COLOR_LIST` / `PAYMENT_COLORS`를 사용. 새 차트 추가 시 로컬 색상 배열 정의 금지 — 반드시 `chartColors.ts`에 상수 추가 후 import.
+
+10. **recharts 도넛 중앙 텍스트**: recharts `<Label>` 컴포넌트의 `content` 콜백에서 받는 `viewBox`는 recharts 버전에 따라 `cx/cy` 미보장. **SVG text 대신 CSS absolute overlay 방식 사용**:
+    ```tsx
+    // 올바름 — CSS overlay (PaymentDonutChart 참고)
+    <div className="relative">
+      <ResponsiveContainer width="100%" height={280}>
+        <PieChart><Pie cy="45%" .../></PieChart>
+      </ResponsiveContainer>
+      <div className="absolute pointer-events-none text-center"
+           style={{ top: '126px', left: '50%', transform: 'translate(-50%, -50%)' }}>
+        {/* top = height(280) × cy(0.45) = 126px */}
+        <div>합계</div><div>{formatCenter(total)}</div>
+      </div>
+    </div>
+    // 잘못됨 — viewBox.cx/cy fallback 0 → 좌상단 렌더링
+    <Label content={(props) => <text x={props.viewBox?.cx ?? 0} .../>} />
+    ```
