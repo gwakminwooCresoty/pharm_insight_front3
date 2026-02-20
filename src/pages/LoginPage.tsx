@@ -2,7 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { DUMMY_ACCOUNTS } from '@/data/auth.dummy';
-import { ROLE_LABELS } from '@/utils/permissions';
+import { BRANDING } from '@/data/branding.dummy';
+
+// PLATFORM_ADMIN은 /platform/login에서 별도 인증
+const TENANT_ACCOUNTS = DUMMY_ACCOUNTS.filter((a) => a.role !== 'PLATFORM_ADMIN');
 
 function PharmLogo({ size = 28 }: { size?: number }) {
   return (
@@ -23,14 +26,6 @@ function PharmLogo({ size = 28 }: { size?: number }) {
   );
 }
 
-const ROLE_COLORS: Record<string, string> = {
-  PLATFORM_ADMIN: 'bg-violet-100 text-violet-700',
-  FRANCHISE_ADMIN: 'bg-blue-100 text-blue-700',
-  FRANCHISE_VIEWER: 'bg-sky-100 text-sky-700',
-  REGION_MANAGER: 'bg-teal-100 text-teal-700',
-  STORE_MANAGER: 'bg-emerald-100 text-emerald-700',
-  STORE_STAFF: 'bg-gray-100 text-gray-600',
-};
 
 export default function LoginPage() {
   const navigate = useNavigate();
@@ -47,7 +42,7 @@ export default function LoginPage() {
   }
 
   function handleQuickLogin(userId: string) {
-    const account = DUMMY_ACCOUNTS.find((a) => a.userId === userId);
+    const account = TENANT_ACCOUNTS.find((a) => a.userId === userId);
     if (account) {
       setEmail(account.email);
       setPassword(account.password);
@@ -64,13 +59,15 @@ export default function LoginPage() {
       const account = DUMMY_ACCOUNTS.find(
         (a) => a.email === email && a.password === password
       );
-      if (account) {
+      if (!account) {
+        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
+      } else if (account.role === 'PLATFORM_ADMIN') {
+        setError('플랫폼 관리자는 관리자 포털(/platform/login)에서 로그인하세요.');
+      } else {
         const { password: _pw, ...user } = account;
         void _pw;
         login(user);
         navigate('/');
-      } else {
-        setError('이메일 또는 비밀번호가 올바르지 않습니다.');
       }
       setLoading(false);
     }, 300);
@@ -83,19 +80,19 @@ export default function LoginPage() {
         <div>
           <div className="flex items-center gap-3 mb-10">
             <PharmLogo size={32} />
-            <span className="text-white font-bold text-lg tracking-tight">PharmInsight</span>
+            <span className="text-white font-bold text-lg tracking-tight">{BRANDING.serviceName}</span>
           </div>
           <h2 className="text-white text-2xl font-bold leading-snug">
-            약국 체인을 위한<br />
-            <span className="text-blue-400">스마트 POS 분석</span>
+            {BRANDING.loginTagline}<br />
+            <span className="text-blue-400">스마트 인사이트</span>
           </h2>
           <p className="text-slate-400 text-sm mt-4 leading-relaxed">
-            멀티 테넌트 기반 실적 관리,<br />
+            데이터 기반 실적 관리,<br />
             결제수단 분석, 카드 승인 내역을<br />
             한눈에 파악하세요.
           </p>
         </div>
-        <p className="text-slate-600 text-xs">PharmInsight v2.0 · 2025</p>
+        <p className="text-slate-600 text-xs">{BRANDING.serviceName} {BRANDING.version} · {BRANDING.year}</p>
       </div>
 
       {/* 오른쪽 로그인 영역 */}
@@ -105,7 +102,7 @@ export default function LoginPage() {
             <div className="flex justify-center mb-2">
               <PharmLogo size={36} />
             </div>
-            <h1 className="text-xl font-bold text-gray-900 mt-2">PharmInsight</h1>
+            <h1 className="text-xl font-bold text-gray-900 mt-2">{BRANDING.serviceName}</h1>
           </div>
 
           <h2 className="text-[15px] font-bold text-gray-900 mb-1">로그인</h2>
@@ -117,7 +114,7 @@ export default function LoginPage() {
               데모 계정 빠른 선택
             </p>
             <div className="grid grid-cols-2 gap-1.5">
-              {DUMMY_ACCOUNTS.map((account) => (
+              {TENANT_ACCOUNTS.map((account) => (
                 <button
                   key={account.userId}
                   type="button"

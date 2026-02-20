@@ -1,7 +1,8 @@
-import { createBrowserRouter, Navigate } from 'react-router-dom';
+import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import AppLayout from '@/components/layout/AppLayout';
 import LoginPage from '@/pages/LoginPage';
+import PlatformLoginPage from '@/pages/PlatformLoginPage';
 import PosStatisticsPage from '@/pages/pos/PosStatisticsPage';
 import ItemDetailPage from '@/pages/pos/ItemDetailPage';
 import SettlementPage from '@/pages/settlement/SettlementPage';
@@ -13,7 +14,11 @@ import type { Permission } from '@/types/auth';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const { isAuthenticated } = useAuth();
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  const location = useLocation();
+  if (!isAuthenticated) {
+    const isPlatformPath = location.pathname.startsWith('/platform/');
+    return <Navigate to={isPlatformPath ? '/platform/login' : '/login'} replace />;
+  }
   return <>{children}</>;
 }
 
@@ -45,6 +50,10 @@ export const router = createBrowserRouter([
   {
     path: '/login',
     element: <LoginPage />,
+  },
+  {
+    path: '/platform/login',
+    element: <PlatformLoginPage />,
   },
   {
     path: '/',

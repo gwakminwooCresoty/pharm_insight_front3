@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { canAccessMenu } from '@/utils/permissions';
+import { BRANDING } from '@/data/branding.dummy';
 
 interface MenuItem {
   path: string;
@@ -75,7 +76,7 @@ export default function Sidebar() {
             </svg>
           </div>
           <span className="font-bold text-[14px] tracking-tight text-white leading-tight">
-            PharmInsight
+            {BRANDING.serviceName}
           </span>
         </div>
         <p className="text-[10px] text-slate-500 mt-1 pl-9">POS 분석 플랫폼</p>
