@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { Hash, CheckCircle2, XCircle, Download } from 'lucide-react';
+import { Hash, CheckCircle2, XCircle, FileSpreadsheet, Trophy } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
-import KpiCard from '@/components/ui/KpiCard';
 import DateRangePicker from '@/components/ui/DateRangePicker';
 import MultiSelect from '@/components/ui/MultiSelect';
 import Button from '@/components/ui/Button';
@@ -9,7 +8,7 @@ import Badge from '@/components/ui/Badge';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import { useAuth } from '@/hooks/useAuth';
-import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
+import { useSetPageMeta, useSetPageFilters, useSetPageFooter } from '@/hooks/usePageMeta';
 import { shouldShowStoreSelector } from '@/utils/permissions';
 import { formatKRW, formatNumber, formatDateTime } from '@/utils/formatters';
 import { paginateArray } from '@/utils/dummy.helpers';
@@ -87,6 +86,28 @@ export default function CardApprovalPage() {
     setPage(0);
   }
 
+  useSetPageFooter(
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2">
+        <Hash size={13} className="text-gray-400" />
+        <span className="text-xs text-gray-500">총 건수</span>
+        <span className="text-sm font-semibold text-gray-900">{formatNumber(filtered.length)}건</span>
+      </div>
+      <div className="w-px h-4 bg-gray-200" />
+      <div className="flex items-center gap-2">
+        <CheckCircle2 size={13} className="text-emerald-500" />
+        <span className="text-xs text-gray-500">총 승인금액</span>
+        <span className="text-sm font-semibold text-gray-900">{formatKRW(totalApproved)}</span>
+      </div>
+      <div className="w-px h-4 bg-gray-200" />
+      <div className="flex items-center gap-2">
+        <XCircle size={13} className="text-red-400" />
+        <span className="text-xs text-gray-500">총 취소금액</span>
+        <span className="text-sm font-semibold text-red-500">{formatKRW(totalCancelled)}</span>
+      </div>
+    </div>,
+  );
+
   useSetPageFilters(
     <div className="flex flex-wrap gap-4 items-end">
       <DateRangePicker
@@ -120,11 +141,10 @@ export default function CardApprovalPage() {
               key={opt.value}
               type="button"
               onClick={() => { setStatusFilter(opt.value); setPage(0); }}
-              className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
-                statusFilter === opt.value
-                  ? 'bg-blue-600 text-white border-blue-600'
-                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-              }`}
+              className={`px-3 py-2 rounded-lg text-sm border transition-colors ${statusFilter === opt.value
+                ? 'bg-blue-600 text-white border-blue-600'
+                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
             >
               {opt.label}
             </button>
@@ -142,113 +162,125 @@ export default function CardApprovalPage() {
         />
       </div>
       <Button>조회</Button>
+      {can('EXPORT_DATA') && (
+        <div>
+          <Button variant="excel">
+            <FileSpreadsheet size={13} />엑셀 다운로드
+          </Button>
+        </div>
+      )}
     </div>,
   );
 
+  const top3 = [...DUMMY_CARD_SUMMARY]
+    .sort((a, b) => b.approvedAmount - a.approvedAmount)
+    .slice(0, 3);
+
+  const rankStyle = [
+    'text-amber-600 bg-amber-50 border-amber-300',
+    'text-slate-500 bg-slate-50 border-slate-300',
+    'text-orange-700 bg-orange-50 border-orange-300',
+  ];
+
   return (
     <PageContainer>
+      <div className="flex gap-3 items-start">
 
-      {/* 카드사별 요약 카드 */}
-      <div className="grid grid-cols-3 gap-2.5">
-        {DUMMY_CARD_SUMMARY.map((card) => (
-          <button
-            key={card.cardCompanyCode}
-            type="button"
-            onClick={() => handleCardSummaryClick(card.cardCompanyCode)}
-            className={`bg-white rounded-lg border p-3 text-left transition-all shadow-sm hover:border-blue-400 hover:shadow-md ${
-              selectedCards.includes(card.cardCompanyCode)
-                ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-400'
-                : 'border-gray-100'
-            }`}
-          >
-            <p className="text-[11px] font-semibold text-gray-400 uppercase">{card.cardCompanyName}</p>
-            <p className="text-[15px] font-bold text-gray-900 mt-1 leading-tight">
-              {formatKRW(card.approvedAmount)}
-            </p>
-            <p className="text-[11px] text-gray-400 mt-0.5">{formatNumber(card.approvedCount)}건</p>
-          </button>
-        ))}
-      </div>
-
-      {/* 승인 내역 테이블 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="text-sm font-semibold text-gray-700">
+        {/* 승인 내역 테이블 */}
+        <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+          <h2 className="text-sm font-semibold text-gray-700 mb-4">
             승인 내역
             <span className="text-gray-400 ml-2 font-normal">
               ({formatNumber(filtered.length)}건)
             </span>
           </h2>
-          {can('EXPORT_DATA') && (
-            <Button variant="secondary" size="sm">
-              <Download size={13} />엑셀 다운로드
-            </Button>
-          )}
-        </div>
 
-        <Table<CardApproval>
-          columns={[
-            {
-              key: 'approvedAt',
-              header: '거래일시',
-              render: (row) => (
-                <span className="text-xs font-mono">{formatDateTime(row.approvedAt)}</span>
-              ),
-            },
-            { key: 'cardCompanyName', header: '카드사' },
-            { key: 'approvalNo', header: '승인번호', className: 'font-mono text-xs' },
-            {
-              key: 'amount',
-              header: '승인금액',
-              render: (row) => formatKRW(row.amount),
-              className: 'text-right',
-            },
-            {
-              key: 'installment',
-              header: '할부',
-              render: (row) =>
-                row.installment === 0 ? '일시불' : `${row.installment}개월`,
-              className: 'text-center',
-            },
-            {
-              key: 'status',
-              header: '상태',
-              render: (row) => (
-                <Badge color={statusBadgeColor(row.status)}>
-                  {statusLabel(row.status)}
-                </Badge>
-              ),
-            },
-            { key: 'storeName', header: '매장' },
-            {
-              key: 'maskedCardNo',
-              header: '카드번호',
-              className: 'font-mono text-xs',
-            },
-          ]}
-          data={paged.content}
-          rowKey={(row) => row.approvalId}
-          rowClassName={rowClass}
-        />
-
-        <Pagination
-          page={page}
-          totalPages={paged.totalPages}
-          totalElements={paged.totalElements}
-          size={PAGE_SIZE}
-          onPageChange={setPage}
-        />
-
-        {/* 하단 집계 */}
-        <div className="mt-4 pt-4 border-t border-gray-200 grid grid-cols-3 gap-4">
-          <KpiCard
-            label="총 건수"
-            value={formatNumber(filtered.length) + '건'}
-            icon={<Hash size={15} />}
+          <Table<CardApproval>
+            columns={[
+              {
+                key: 'approvedAt',
+                header: '거래일시',
+                render: (row) => (
+                  <span className="text-xs font-mono">{formatDateTime(row.approvedAt)}</span>
+                ),
+              },
+              { key: 'cardCompanyName', header: '카드사' },
+              { key: 'approvalNo', header: '승인번호', className: 'font-mono text-xs' },
+              {
+                key: 'amount',
+                header: '승인금액',
+                render: (row) => formatKRW(row.amount),
+                className: 'text-right',
+              },
+              {
+                key: 'installment',
+                header: '할부',
+                render: (row) =>
+                  row.installment === 0 ? '일시불' : `${row.installment}개월`,
+                className: 'text-center',
+              },
+              {
+                key: 'status',
+                header: '상태',
+                render: (row) => (
+                  <Badge color={statusBadgeColor(row.status)}>
+                    {statusLabel(row.status)}
+                  </Badge>
+                ),
+              },
+              { key: 'storeName', header: '매장' },
+              {
+                key: 'maskedCardNo',
+                header: '카드번호',
+                className: 'font-mono text-xs',
+              },
+            ]}
+            data={paged.content}
+            rowKey={(row) => row.approvalId}
+            rowClassName={rowClass}
           />
-          <KpiCard label="총 승인금액" value={formatKRW(totalApproved)} icon={<CheckCircle2 size={15} />} />
-          <KpiCard label="총 취소금액" value={formatKRW(totalCancelled)} icon={<XCircle size={15} />} />
+
+          <Pagination
+            page={page}
+            totalPages={paged.totalPages}
+            totalElements={paged.totalElements}
+            size={PAGE_SIZE}
+            onPageChange={setPage}
+          />
         </div>
+
+        {/* 카드사 매출 TOP 3 - 오른쪽 컬럼 */}
+        <div className="w-40 shrink-0 flex flex-col gap-2">
+          <div className="flex items-center gap-1.5">
+            <Trophy size={12} className="text-amber-500" />
+            <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide">
+              매출 TOP 3
+            </span>
+          </div>
+          {top3.map((card, idx) => (
+            <button
+              key={card.cardCompanyCode}
+              type="button"
+              onClick={() => handleCardSummaryClick(card.cardCompanyCode)}
+              className={`bg-white rounded-lg border px-3 py-2 text-left transition-all shadow-sm hover:border-blue-400 hover:shadow-md ${selectedCards.includes(card.cardCompanyCode)
+                ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-400'
+                : 'border-gray-100'
+                }`}
+            >
+              <div className="flex items-center justify-between mb-0.5">
+                <p className="text-[11px] font-semibold text-gray-500">{card.cardCompanyName}</p>
+                <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full border ${rankStyle[idx]}`}>
+                  {idx + 1}위
+                </span>
+              </div>
+              <p className="text-sm font-bold text-gray-900 leading-tight">
+                {formatKRW(card.approvedAmount)}
+              </p>
+              <p className="text-[11px] text-gray-400 mt-0.5">{formatNumber(card.approvedCount)}건</p>
+            </button>
+          ))}
+        </div>
+
       </div>
     </PageContainer>
   );

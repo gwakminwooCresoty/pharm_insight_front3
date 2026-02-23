@@ -94,7 +94,7 @@ src/
 │
 ├── hooks/
 │   ├── useAuth.ts             # useAuthStore 래퍼: { currentUser, isAuthenticated, login, logout, can() }
-│   └── usePageMeta.tsx        # PageMetaContext + PageMetaProvider + useSetPageMeta() + useSetPageFilters() + usePageMeta() + usePageFilters()
+│   └── usePageMeta.tsx        # PageMetaContext + PageMetaProvider + useSetPageMeta() + useSetPageFilters() + useSetPageFooter() + usePageMeta() + usePageFilters() + usePageFooter()
 │
 ├── utils/
 │   ├── permissions.ts         # ROLE_LABELS, hasPermission(), canAccessMenu(), shouldShowStoreSelector()
@@ -115,10 +115,11 @@ src/
 │
 ├── components/
 │   ├── layout/
-│   │   ├── AppLayout.tsx      # PageMetaProvider + Sidebar + TopHeader + FilterBar + <Outlet /> 래퍼
+│   │   ├── AppLayout.tsx      # PageMetaProvider + Sidebar + TopHeader + FilterBar + <Outlet /> + FooterBar 래퍼
 │   │   ├── Sidebar.tsx        # w-48, slate-900 배경, lucide 아이콘, SVG 로고마크
 │   │   ├── TopHeader.tsx      # h-14, usePageMeta()로 title+subtitle 표시, 사용자 정보, 로그아웃
 │   │   ├── FilterBar.tsx      # usePageFilters()로 각 페이지의 필터 JSX를 헤더 아래 고정 렌더링
+│   │   ├── FooterBar.tsx      # usePageFooter()로 각 페이지의 집계 JSX를 스크롤 영역 밖 하단 고정 렌더링
 │   │   └── PageContainer.tsx  # 순수 gap-4 수직 스택 래퍼 (title/subtitle/actions 없음)
 │   │
 │   ├── ui/
@@ -311,6 +312,19 @@ useSetPageFilters(
     <div className="ml-auto"><Button>+ 등록</Button></div>  {/* 오른쪽 정렬 */}
   </div>,
 );
+
+// 집계/요약 JSX를 스크롤 영역 밖 하단 FooterBar에 고정 렌더링
+useSetPageFooter(
+  <div className="flex items-center gap-6">
+    <div className="flex items-center gap-2">
+      <Icon size={13} className="text-gray-400" />
+      <span className="text-xs text-gray-500">레이블</span>
+      <span className="text-sm font-semibold text-gray-900">값</span>
+    </div>
+    <div className="w-px h-4 bg-gray-200" />  {/* 구분선 */}
+    ...
+  </div>,
+);
 // 언마운트 시 자동 정리 — 별도 cleanup 불필요
 ```
 
@@ -398,6 +412,7 @@ const [open, setOpen] = useState(false);
 - **사이드바**: `w-48 bg-slate-900` 고정
 - **헤더**: `h-14 bg-white border-b border-gray-100` (title + subtitle 2줄 수용)
 - **필터바**: `bg-white border-b border-gray-100 px-6 py-3` — 필터 없는 페이지에서는 자동 숨김
+- **푸터바**: `bg-white border-t border-gray-200 px-6 py-3 shadow-[0_-1px_4px_rgba(0,0,0,0.06)]` — 집계 없는 페이지에서는 자동 숨김
 - **페이지 패딩**: `px-6 py-5`
 - **섹션 간격**: `gap-4` (PageContainer flex-col)
 

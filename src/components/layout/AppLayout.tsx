@@ -2,6 +2,7 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import TopHeader from './TopHeader';
 import FilterBar from './FilterBar';
+import FooterBar from './FooterBar';
 import { PageMetaProvider } from '@/hooks/usePageMeta';
 
 export default function AppLayout() {
@@ -17,6 +18,7 @@ export default function AppLayout() {
               <Outlet />
             </div>
           </main>
+          <FooterBar />
         </div>
       </div>
     </PageMetaProvider>

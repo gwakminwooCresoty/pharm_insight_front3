@@ -6,17 +6,19 @@ interface PageMeta {
 }
 
 // ── Setters context: useState 세터는 React가 안정성을 보장하므로 절대 변경되지 않는다.
-//    페이지는 이 컨텍스트만 구독하므로, meta/filters 업데이트 시 페이지가 재렌더되지 않는다.
+//    페이지는 이 컨텍스트만 구독하므로, meta/filters/footer 업데이트 시 페이지가 재렌더되지 않는다.
 interface PageMetaSettersContextValue {
   setMeta: React.Dispatch<React.SetStateAction<PageMeta>>;
   setFilters: React.Dispatch<React.SetStateAction<React.ReactNode>>;
+  setFooter: React.Dispatch<React.SetStateAction<React.ReactNode>>;
 }
 
-// ── Values context: meta와 filtersNode가 변경될 때마다 업데이트된다.
-//    TopHeader와 FilterBar만 이 컨텍스트를 구독한다.
+// ── Values context: 각 슬롯 값이 변경될 때 업데이트된다.
+//    TopHeader, FilterBar, FooterBar만 이 컨텍스트를 구독한다.
 interface PageMetaValuesContextValue {
   meta: PageMeta;
   filtersNode: React.ReactNode;
+  footerNode: React.ReactNode;
 }
 
 const PageMetaSettersContext = createContext<PageMetaSettersContextValue | null>(null);
@@ -25,10 +27,10 @@ const PageMetaValuesContext = createContext<PageMetaValuesContextValue | null>(n
 export function PageMetaProvider({ children }: { children: React.ReactNode }) {
   const [meta, setMeta] = useState<PageMeta>({ title: '' });
   const [filtersNode, setFilters] = useState<React.ReactNode>(null);
+  const [footerNode, setFooter] = useState<React.ReactNode>(null);
 
-  // useState 세터는 참조가 안정적이므로 deps를 [setMeta, setFilters]로 지정해도 절대 재생성되지 않는다.
-  const setters = useMemo(() => ({ setMeta, setFilters }), [setMeta, setFilters]);
-  const values = useMemo(() => ({ meta, filtersNode }), [meta, filtersNode]);
+  const setters = useMemo(() => ({ setMeta, setFilters, setFooter }), [setMeta, setFilters, setFooter]);
+  const values = useMemo(() => ({ meta, filtersNode, footerNode }), [meta, filtersNode, footerNode]);
 
   return (
     <PageMetaSettersContext.Provider value={setters}>
@@ -49,21 +51,30 @@ export function useSetPageMeta(title: string, subtitle?: string) {
 
 /**
  * 페이지의 필터 JSX를 헤더 아래 FilterBar에 렌더링한다.
- * Setters context만 구독하므로 filters 업데이트 시 페이지가 재렌더되지 않는다 → 무한 루프 방지.
+ * Setters context만 구독하므로 context 업데이트로 인한 무한 루프가 발생하지 않는다.
  */
 export function useSetPageFilters(node: React.ReactNode) {
   const setFilters = useContext(PageMetaSettersContext)?.setFilters;
-
-  // 매 렌더 후 필터 노드를 동기화 (deps 없음 = 매 렌더 실행)
-  // 페이지가 PageMetaValuesContext를 구독하지 않으므로 context 업데이트로 재렌더되지 않아 안전하다.
   useEffect(() => {
     setFilters?.(node);
   });
-
-  // 페이지 언마운트 시에만 필터를 제거한다
   useEffect(() => {
     return () => setFilters?.(null);
   }, [setFilters]);
+}
+
+/**
+ * 페이지의 집계/요약 JSX를 스크롤 영역 밖 하단 FooterBar에 고정 렌더링한다.
+ * Setters context만 구독하므로 context 업데이트로 인한 무한 루프가 발생하지 않는다.
+ */
+export function useSetPageFooter(node: React.ReactNode) {
+  const setFooter = useContext(PageMetaSettersContext)?.setFooter;
+  useEffect(() => {
+    setFooter?.(node);
+  });
+  useEffect(() => {
+    return () => setFooter?.(null);
+  }, [setFooter]);
 }
 
 /** TopHeader에서 title/subtitle을 읽는다. */
@@ -74,4 +85,9 @@ export function usePageMeta(): PageMeta {
 /** FilterBar에서 filtersNode를 읽는다. */
 export function usePageFilters(): React.ReactNode {
   return useContext(PageMetaValuesContext)?.filtersNode;
+}
+
+/** FooterBar에서 footerNode를 읽는다. */
+export function usePageFooter(): React.ReactNode {
+  return useContext(PageMetaValuesContext)?.footerNode;
 }

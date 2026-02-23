@@ -2,7 +2,7 @@ interface ButtonProps {
   children: React.ReactNode;
   onClick?: React.MouseEventHandler<HTMLButtonElement>;
   type?: 'button' | 'submit' | 'reset';
-  variant?: 'primary' | 'secondary' | 'danger' | 'ghost';
+  variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'excel';
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   className?: string;
@@ -14,6 +14,7 @@ const variantClass: Record<NonNullable<ButtonProps['variant']>, string> = {
     'bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 disabled:opacity-50',
   danger: 'bg-red-600 text-white hover:bg-red-700 disabled:bg-red-300',
   ghost: 'text-gray-600 hover:bg-gray-100 disabled:opacity-50',
+  excel: 'bg-[#217346] text-white hover:bg-[#1a5c38] disabled:bg-green-300',
 };
 
 const sizeClass: Record<NonNullable<ButtonProps['size']>, string> = {
