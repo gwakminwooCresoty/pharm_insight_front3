@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { MapPin } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
@@ -10,10 +11,12 @@ import { paginateArray } from '@/utils/dummy.helpers';
 import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import {
   DUMMY_FRANCHISES,
+  DUMMY_STORES,
   type FranchiseSummary,
   type FranchiseStatus,
 } from '@/data/platform.dummy';
 import TenantPermissionModal from './TenantPermissionModal';
+import StoreMap from '@/components/map/StoreMap';
 
 type FormData = {
   franchiseName: string;
@@ -105,6 +108,7 @@ export default function TenantManagePage() {
   const [editTarget, setEditTarget] = useState<FranchiseSummary | null>(null);
   const [statusTarget, setStatusTarget] = useState<FranchiseSummary | null>(null);
   const [permissionTarget, setPermissionTarget] = useState<FranchiseSummary | null>(null);
+  const [mapTarget, setMapTarget] = useState<FranchiseSummary | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const {
@@ -284,6 +288,17 @@ export default function TenantManagePage() {
                   >
                     상태변경
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={(e) => {
+                      (e as React.MouseEvent).stopPropagation();
+                      setMapTarget(row);
+                    }}
+                    title="매장 지도 보기"
+                  >
+                    <MapPin size={16} />
+                  </Button>
                 </div>
               ),
             },
@@ -378,6 +393,34 @@ export default function TenantManagePage() {
         tenant={permissionTarget}
         onClose={() => setPermissionTarget(null)}
       />
+
+      {/* 매장 지도 모달 (실제 지도 연동) */}
+      <Modal
+        open={mapTarget !== null}
+        onClose={() => setMapTarget(null)}
+        title={`매장 분포 지도 — ${mapTarget?.franchiseName}`}
+        size="lg"
+      >
+        <div className="flex flex-col gap-4">
+          <div className="flex items-center justify-between text-sm text-gray-600">
+            <span>총 등록 매장: <strong>{mapTarget?.storeCount || 0}</strong>개</span>
+          </div>
+
+          <div className="relative w-full h-[400px] bg-slate-50 rounded-xl overflow-hidden border border-slate-200">
+            {mapTarget && (
+              <StoreMap
+                stores={DUMMY_STORES.filter((s) => s.franchiseId === mapTarget.franchiseId)}
+              />
+            )}
+            {mapTarget && DUMMY_STORES.filter((s) => s.franchiseId === mapTarget.franchiseId).length === 0 && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-white/80 backdrop-blur-sm text-gray-500">
+                <span className="text-4xl mb-2">🗺️</span>
+                <p>등록된 가맹점 좌표 데이터가 없습니다.</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </Modal>
     </PageContainer>
   );
 }

@@ -17,9 +17,11 @@
   },
   "dependencies": {
     "lucide-react": "^0.575.0",
+    "maplibre-gl": "^5.18.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
     "react-hook-form": "^7.71.1",
+    "react-map-gl": "^8.1.0",
     "react-router-dom": "^7.13.0",
     "recharts": "^3.7.0",
     "zustand": "^5.0.11"

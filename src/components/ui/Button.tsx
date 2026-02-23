@@ -6,6 +6,7 @@ interface ButtonProps {
   size?: 'sm' | 'md' | 'lg';
   disabled?: boolean;
   className?: string;
+  title?: string;
 }
 
 const variantClass: Record<NonNullable<ButtonProps['variant']>, string> = {
@@ -31,12 +32,14 @@ export default function Button({
   size = 'md',
   disabled = false,
   className = '',
+  title,
 }: ButtonProps) {
   return (
     <button
       type={type}
       onClick={onClick}
       disabled={disabled}
+      title={title}
       className={`inline-flex items-center gap-1.5 rounded-md font-medium transition-colors cursor-pointer disabled:cursor-not-allowed ${variantClass[variant]} ${sizeClass[size]} ${className}`}
     >
       {children}

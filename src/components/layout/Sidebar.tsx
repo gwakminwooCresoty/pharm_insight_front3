@@ -22,6 +22,7 @@ const ALL_MENU_ITEMS: MenuItem[] = [
   { path: '/pos/statistics', label: 'POS 실적 조회', icon: <BarChart2 size={15} /> },
   { path: '/settlement', label: 'CR정산서', menuKey: 'settlement', icon: <FileText size={15} /> },
   { path: '/card/approvals', label: '카드승인 조회', menuKey: 'card', icon: <CreditCard size={15} /> },
+  { path: '/franchise/stores', label: '인사이트 맵', menuKey: 'franchise-stores', icon: <Building2 size={15} /> },
 ];
 
 const PLATFORM_MENU_ITEMS: MenuItem[] = [
@@ -34,13 +35,13 @@ const PLATFORM_MENU_ITEMS: MenuItem[] = [
   {
     path: '/platform/tenants',
     label: '테넌트 관리',
-    menuKey: 'platform-tenants',
+    menuKey: 'tenant-manage',
     icon: <Building2 size={15} />,
   },
   {
     path: '/platform/users',
     label: '사용자 관리',
-    menuKey: 'platform-users',
+    menuKey: 'user-manage',
     icon: <Users size={15} />,
   },
 ];
@@ -57,7 +58,13 @@ export default function Sidebar() {
 
   const visibleMenu = ALL_MENU_ITEMS.filter(
     (item) => !item.menuKey || canAccessMenu(currentUser, item.menuKey)
-  );
+  ).map(item => {
+    // 플랫폼 관리자인 경우 플랫폼 전용 인사이트 맵으로 라우팅
+    if (item.menuKey === 'franchise-stores' && currentUser.role === 'PLATFORM_ADMIN') {
+      return { ...item, path: '/platform/insight-map' };
+    }
+    return item;
+  });
 
   const visiblePlatformMenu = PLATFORM_MENU_ITEMS.filter(
     (item) => !item.menuKey || canAccessMenu(currentUser, item.menuKey)
@@ -92,7 +99,7 @@ export default function Sidebar() {
             key={item.path}
             to={item.path}
             className={({ isActive }) =>
-              `${linkBase} ${isActive ? linkActive : linkIdle}`
+              isActive ? linkBase + " " + linkActive : linkBase + " " + linkIdle
             }
           >
             <span className="shrink-0">{item.icon}</span>
@@ -110,7 +117,7 @@ export default function Sidebar() {
                 key={item.path}
                 to={item.path}
                 className={({ isActive }) =>
-                  `${linkBase} ${isActive ? linkActive : linkIdle}`
+                  isActive ? linkBase + " " + linkActive : linkBase + " " + linkIdle
                 }
               >
                 <span className="shrink-0">{item.icon}</span>

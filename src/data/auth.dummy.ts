@@ -24,6 +24,7 @@ export const DUMMY_ACCOUNTS: DummyAccount[] = [
       'USER_MANAGE',
       'TENANT_MANAGE',
       'PLATFORM_DASHBOARD',
+      'FRANCHISE_STORE_MANAGE',
     ],
   },
   {
@@ -43,6 +44,7 @@ export const DUMMY_ACCOUNTS: DummyAccount[] = [
       'CARD_APPROVAL_READ',
       'EXPORT_DATA',
       'USER_MANAGE',
+      'FRANCHISE_STORE_MANAGE',
     ],
   },
   {

@@ -10,6 +10,8 @@ import CardApprovalPage from '@/pages/card/CardApprovalPage';
 import PlatformDashboardPage from '@/pages/platform/PlatformDashboardPage';
 import TenantManagePage from '@/pages/platform/TenantManagePage';
 import UserManagePage from '@/pages/platform/UserManagePage';
+import StoreManagePage from '@/pages/franchise/StoreManagePage';
+import PlatformInsightMapPage from '@/pages/platform/PlatformInsightMapPage';
 import type { Permission } from '@/types/auth';
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
@@ -112,6 +114,22 @@ export const router = createBrowserRouter([
         element: (
           <RoleGuard permission="USER_MANAGE">
             <UserManagePage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'platform/insight-map',
+        element: (
+          <RoleGuard permission="PLATFORM_DASHBOARD">
+            <PlatformInsightMapPage />
+          </RoleGuard>
+        ),
+      },
+      {
+        path: 'franchise/stores',
+        element: (
+          <RoleGuard permission="FRANCHISE_STORE_MANAGE">
+            <StoreManagePage />
           </RoleGuard>
         ),
       },

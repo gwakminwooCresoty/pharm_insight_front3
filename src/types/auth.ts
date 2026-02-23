@@ -13,7 +13,8 @@ export type Permission =
   | 'EXPORT_DATA'
   | 'USER_MANAGE'
   | 'TENANT_MANAGE'
-  | 'PLATFORM_DASHBOARD';
+  | 'PLATFORM_DASHBOARD'
+  | 'FRANCHISE_STORE_MANAGE';
 
 export interface AuthUser {
   userId: string;
