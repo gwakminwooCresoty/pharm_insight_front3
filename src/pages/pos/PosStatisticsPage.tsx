@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { TrendingUp, Users, ShoppingBag, Download } from 'lucide-react';
+import { TrendingUp, Users, ShoppingBag, FileSpreadsheet } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import KpiCard from '@/components/ui/KpiCard';
 import DateRangePicker from '@/components/ui/DateRangePicker';
@@ -96,11 +96,10 @@ export default function PosStatisticsPage() {
                 key={opt.value}
                 type="button"
                 onClick={() => setAxisType(opt.value)}
-                className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
-                  axisType === opt.value
+                className={`px-3 py-2 rounded-lg text-sm border transition-colors ${axisType === opt.value
                     ? 'bg-blue-600 text-white border-blue-600'
                     : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                }`}
+                  }`}
               >
                 {opt.label}
               </button>
@@ -134,6 +133,13 @@ export default function PosStatisticsPage() {
           {showCompare ? '비교기간 닫기' : '기간 비교'}
         </Button>
         <Button onClick={() => setPage(0)}>조회</Button>
+        {can('EXPORT_DATA') && (
+          <div>
+            <Button variant="excel">
+              <FileSpreadsheet size={13} />엑셀 다운로드
+            </Button>
+          </div>
+        )}
       </div>
       {showCompare && (
         <div className="mt-3 pt-3 border-t border-gray-100">
@@ -151,145 +157,139 @@ export default function PosStatisticsPage() {
 
   return (
     <PageContainer>
+      <div className="flex gap-3 items-start">
 
-      {/* KPI 요약 카드 */}
-      <div className="grid grid-cols-3 gap-4">
-        <KpiCard
-          label="매출액"
-          value={formatKRW(DUMMY_POS_SUMMARY.totalSales)}
-          compareRatio={showCompare ? DUMMY_POS_SUMMARY.compareRatio : undefined}
-          icon={<TrendingUp size={15} />}
-        />
-        <KpiCard
-          label="객수"
-          value={formatNumber(DUMMY_POS_SUMMARY.customerCount) + '명'}
-          compareRatio={showCompare ? 3.1 : undefined}
-          icon={<Users size={15} />}
-        />
-        <KpiCard
-          label="객단가"
-          value={formatKRW(DUMMY_POS_SUMMARY.avgSpend)}
-          compareRatio={showCompare ? 2.0 : undefined}
-          icon={<ShoppingBag size={15} />}
-        />
-      </div>
+        {/* 탭 패널 — 메인 콘텐츠 */}
+        <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-100 shadow-sm">
+          <div className="flex border-b border-gray-200">
+            <button
+              type="button"
+              onClick={() => setActiveTab('item')}
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'item'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+            >
+              상품별 통계
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveTab('date')}
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'date'
+                  ? 'border-blue-600 text-blue-600'
+                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                }`}
+            >
+              일자별 통계
+            </button>
+          </div>
 
-      {/* 트렌드 차트 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">매출 추이</h2>
-        <TrendLineChart
-          data={trendData}
-          showCompare={Boolean(showCompareChart)}
-        />
-      </div>
-
-      {/* 탭 */}
-      <div className="bg-white rounded-lg border border-gray-100 shadow-sm">
-        <div className="flex border-b border-gray-200">
-          <button
-            type="button"
-            onClick={() => setActiveTab('item')}
-            className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'item'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            상품별 통계
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveTab('date')}
-            className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${
-              activeTab === 'date'
-                ? 'border-blue-600 text-blue-600'
-                : 'border-transparent text-gray-500 hover:text-gray-700'
-            }`}
-          >
-            일자별 통계
-          </button>
-          {can('EXPORT_DATA') && (
-            <div className="ml-auto flex items-center pr-4">
-              <Button variant="secondary" size="sm">
-                <Download size={13} />엑셀 다운로드
-              </Button>
-            </div>
-          )}
+          <div className="p-4">
+            {activeTab === 'item' ? (
+              <>
+                <Table<ItemRank & { _idx: number }>
+                  columns={[
+                    {
+                      key: 'rank',
+                      header: '순위',
+                      render: (row) => (
+                        <span className="text-gray-400 font-mono">
+                          {page * PAGE_SIZE + ((row as unknown as { _idx: number })._idx) + 1}
+                        </span>
+                      ),
+                    },
+                    { key: 'itemCode', header: '단품코드', className: 'font-mono text-xs' },
+                    { key: 'itemName', header: '단품명' },
+                    { key: 'category', header: '분류' },
+                    {
+                      key: 'qty',
+                      header: '판매수량',
+                      render: (row) => formatNumber(row.qty) + '개',
+                      className: 'text-right',
+                    },
+                    {
+                      key: 'sales',
+                      header: '매출액',
+                      render: (row) => formatKRW(row.sales),
+                      className: 'text-right font-medium',
+                    },
+                    {
+                      key: 'ratio',
+                      header: '구성비',
+                      render: (row) => formatRatio(row.ratio),
+                      className: 'text-right',
+                    },
+                  ]}
+                  data={pagedItems.content.map((item, i) => ({
+                    ...item,
+                    _idx: i,
+                  }))}
+                  rowKey={(row) => row.itemCode}
+                  onRowClick={(row) => navigate(`/pos/items/${row.itemCode}`)}
+                />
+                <Pagination
+                  page={page}
+                  totalPages={pagedItems.totalPages}
+                  totalElements={pagedItems.totalElements}
+                  size={PAGE_SIZE}
+                  onPageChange={setPage}
+                />
+              </>
+            ) : (
+              <>
+                {/* 차트 — 일자별 통계 탭에 통합 */}
+                <TrendLineChart
+                  data={trendData}
+                  showCompare={Boolean(showCompareChart)}
+                />
+                <div className="mt-4 pt-3 border-t border-gray-100">
+                  <Table
+                    columns={[
+                      { key: 'axis', header: '일자' },
+                      {
+                        key: 'sales',
+                        header: '매출액',
+                        render: (row) => formatKRW((row as typeof trendData[0]).sales),
+                        className: 'text-right',
+                      },
+                      {
+                        key: 'customers',
+                        header: '객수',
+                        render: (row) => formatNumber((row as typeof trendData[0]).customers) + '명',
+                        className: 'text-right',
+                      },
+                    ]}
+                    data={DUMMY_TREND_DATE}
+                    rowKey={(row) => row.axis}
+                  />
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
-        <div className="p-4">
-          {activeTab === 'item' ? (
-            <>
-              <Table<ItemRank & { _idx: number }>
-                columns={[
-                  {
-                    key: 'rank',
-                    header: '순위',
-                    render: (row) => (
-                      <span className="text-gray-400 font-mono">
-                        {page * PAGE_SIZE + ((row as unknown as { _idx: number })._idx) + 1}
-                      </span>
-                    ),
-                  },
-                  { key: 'itemCode', header: '단품코드', className: 'font-mono text-xs' },
-                  { key: 'itemName', header: '단품명' },
-                  { key: 'category', header: '분류' },
-                  {
-                    key: 'qty',
-                    header: '판매수량',
-                    render: (row) => formatNumber(row.qty) + '개',
-                    className: 'text-right',
-                  },
-                  {
-                    key: 'sales',
-                    header: '매출액',
-                    render: (row) => formatKRW(row.sales),
-                    className: 'text-right font-medium',
-                  },
-                  {
-                    key: 'ratio',
-                    header: '구성비',
-                    render: (row) => formatRatio(row.ratio),
-                    className: 'text-right',
-                  },
-                ]}
-                data={pagedItems.content.map((item, i) => ({
-                  ...item,
-                  _idx: i,
-                }))}
-                rowKey={(row) => row.itemCode}
-                onRowClick={(row) => navigate(`/pos/items/${row.itemCode}`)}
-              />
-              <Pagination
-                page={page}
-                totalPages={pagedItems.totalPages}
-                totalElements={pagedItems.totalElements}
-                size={PAGE_SIZE}
-                onPageChange={setPage}
-              />
-            </>
-          ) : (
-            <Table
-              columns={[
-                { key: 'axis', header: '일자' },
-                {
-                  key: 'sales',
-                  header: '매출액',
-                  render: (row) => formatKRW((row as typeof trendData[0]).sales),
-                  className: 'text-right',
-                },
-                {
-                  key: 'customers',
-                  header: '객수',
-                  render: (row) => formatNumber((row as typeof trendData[0]).customers) + '명',
-                  className: 'text-right',
-                },
-              ]}
-              data={DUMMY_TREND_DATE}
-              rowKey={(row) => row.axis}
-            />
-          )}
+        {/* KPI 요약 — 오른쪽 컬럼 */}
+        <div className="w-52 shrink-0 flex flex-col gap-2">
+          <KpiCard
+            label="매출액"
+            value={formatKRW(DUMMY_POS_SUMMARY.totalSales)}
+            compareRatio={showCompare ? DUMMY_POS_SUMMARY.compareRatio : undefined}
+            icon={<TrendingUp size={15} />}
+          />
+          <KpiCard
+            label="객수"
+            value={formatNumber(DUMMY_POS_SUMMARY.customerCount) + '명'}
+            compareRatio={showCompare ? 3.1 : undefined}
+            icon={<Users size={15} />}
+          />
+          <KpiCard
+            label="객단가"
+            value={formatKRW(DUMMY_POS_SUMMARY.avgSpend)}
+            compareRatio={showCompare ? 2.0 : undefined}
+            icon={<ShoppingBag size={15} />}
+          />
         </div>
+
       </div>
     </PageContainer>
   );
