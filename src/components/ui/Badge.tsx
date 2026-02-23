@@ -4,12 +4,12 @@ interface BadgeProps {
 }
 
 const colorClass: Record<NonNullable<BadgeProps['color']>, string> = {
-  green: 'bg-green-100 text-green-800',
-  orange: 'bg-orange-100 text-orange-800',
-  red: 'bg-red-100 text-red-800',
-  gray: 'bg-gray-100 text-gray-700',
-  blue: 'bg-blue-100 text-blue-800',
-  yellow: 'bg-yellow-100 text-yellow-800',
+  green: 'bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-600/10',
+  orange: 'bg-orange-50 text-orange-700 ring-1 ring-inset ring-orange-600/10',
+  red: 'bg-red-50 text-red-700 ring-1 ring-inset ring-red-600/10',
+  gray: 'bg-slate-50 text-slate-600 ring-1 ring-inset ring-slate-500/10',
+  blue: 'bg-primary-50 text-primary-700 ring-1 ring-inset ring-primary-600/10',
+  yellow: 'bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-600/10',
 };
 
 export default function Badge({

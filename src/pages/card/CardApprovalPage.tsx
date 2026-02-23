@@ -140,7 +140,7 @@ export default function CardApprovalPage() {
         />
       )}
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">승인 상태</span>
+        <span className="text-xs text-slate-500 font-medium">승인 상태</span>
         <div className="flex gap-1">
           {STATUS_OPTIONS.map((opt) => (
             <button
@@ -148,8 +148,8 @@ export default function CardApprovalPage() {
               type="button"
               onClick={() => { setStatusFilter(opt.value); setPage(0); }}
               className={`px-3 py-2 rounded-lg text-sm border transition-colors ${statusFilter === opt.value
-                ? 'bg-blue-600 text-white border-blue-600'
-                : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                ? 'bg-primary-600 text-white ring-primary-600 shadow-sm'
+                : 'ring-slate-200 text-slate-600 hover:bg-slate-50'
                 }`}
             >
               {opt.label}
@@ -158,13 +158,13 @@ export default function CardApprovalPage() {
         </div>
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">승인번호</span>
+        <span className="text-xs text-slate-500 font-medium">승인번호</span>
         <input
           type="text"
           value={approvalNo}
           onChange={(e) => { setApprovalNo(e.target.value); setPage(0); }}
           placeholder="승인번호 검색"
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all w-32"
         />
       </div>
       <Button>조회</Button>
@@ -193,7 +193,7 @@ export default function CardApprovalPage() {
       <div className="flex gap-3 items-start">
 
         {/* 승인 내역 테이블 */}
-        <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+        <div className="flex-1 min-w-0 bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
           <h2 className="text-sm font-semibold text-gray-700 mb-4">
             승인 내역
             <span className="text-gray-400 ml-2 font-normal">
@@ -268,9 +268,9 @@ export default function CardApprovalPage() {
               key={card.cardCompanyCode}
               type="button"
               onClick={() => handleCardSummaryClick(card.cardCompanyCode)}
-              className={`bg-white rounded-lg border px-3 py-2 text-left transition-all shadow-sm hover:border-blue-400 hover:shadow-md ${selectedCards.includes(card.cardCompanyCode)
-                ? 'border-blue-500 bg-blue-50 ring-1 ring-blue-400'
-                : 'border-gray-100'
+              className={`bg-white rounded-[var(--radius-card)] border px-3 py-2 text-left transition-all shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] hover:border-primary-400 ${selectedCards.includes(card.cardCompanyCode)
+                ? 'border-primary-500 bg-primary-50 ring-1 ring-primary-400'
+                : 'border-slate-100'
                 }`}
             >
               <div className="flex items-center justify-between mb-0.5">

@@ -1,3 +1,5 @@
+import { ChevronLeft, ChevronRight, ChevronsLeft, ChevronsRight } from 'lucide-react';
+
 interface PaginationProps {
   page: number; // 0-based
   totalPages: number;
@@ -23,34 +25,42 @@ export default function Pagination({
   const rangeEnd = Math.min(totalPages - 1, page + 2);
   for (let i = rangeStart; i <= rangeEnd; i++) pages.push(i);
 
+  const navBtn =
+    'w-8 h-8 flex items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-600 disabled:opacity-30 disabled:hover:bg-transparent disabled:hover:text-slate-400 transition-colors duration-[var(--transition-fast)]';
+  const pageBtn = (active: boolean) =>
+    `w-8 h-8 flex items-center justify-center rounded-lg text-sm font-medium transition-all duration-[var(--transition-fast)] ${active
+      ? 'bg-primary-600 text-white shadow-sm'
+      : 'text-slate-600 hover:bg-slate-100'
+    }`;
+
   return (
     <div className="flex items-center justify-between mt-4">
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-slate-500">
         {totalElements.toLocaleString()}건 중 {start}–{end}
       </span>
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5">
         <button
           type="button"
           onClick={() => onPageChange(0)}
           disabled={page === 0}
-          className="px-2 py-1 text-sm rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50"
+          className={navBtn}
         >
-          «
+          <ChevronsLeft size={16} />
         </button>
         <button
           type="button"
           onClick={() => onPageChange(page - 1)}
           disabled={page === 0}
-          className="px-2 py-1 text-sm rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50"
+          className={navBtn}
         >
-          ‹
+          <ChevronLeft size={16} />
         </button>
         {pages.map((p) => (
           <button
             key={p}
             type="button"
             onClick={() => onPageChange(p)}
-            className={`px-3 py-1 text-sm rounded border ${p === page ? 'bg-blue-600 text-white border-blue-600' : 'border-gray-200 hover:bg-gray-50'}`}
+            className={pageBtn(p === page)}
           >
             {p + 1}
           </button>
@@ -59,17 +69,17 @@ export default function Pagination({
           type="button"
           onClick={() => onPageChange(page + 1)}
           disabled={page >= totalPages - 1}
-          className="px-2 py-1 text-sm rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50"
+          className={navBtn}
         >
-          ›
+          <ChevronRight size={16} />
         </button>
         <button
           type="button"
           onClick={() => onPageChange(totalPages - 1)}
           disabled={page >= totalPages - 1}
-          className="px-2 py-1 text-sm rounded border border-gray-200 disabled:opacity-40 hover:bg-gray-50"
+          className={navBtn}
         >
-          »
+          <ChevronsRight size={16} />
         </button>
       </div>
     </div>

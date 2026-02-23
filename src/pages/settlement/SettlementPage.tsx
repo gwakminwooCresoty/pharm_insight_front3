@@ -35,31 +35,30 @@ type StoreRow = {
 const STORE_SETTLEMENT: StoreRow[] = [
   { storeId: 'STORE-001', storeName: '강남점', totalSales: 48_200_000, cardRatio: 0.78, transactionCount: 1420, avgAmount: 33944 },
   { storeId: 'STORE-002', storeName: '서초점', totalSales: 35_800_000, cardRatio: 0.82, transactionCount: 1050, avgAmount: 34095 },
-  { storeId: 'STORE-003', storeName: '송파점', totalSales: 28_600_000, cardRatio: 0.71, transactionCount: 890,  avgAmount: 32135 },
-  { storeId: 'STORE-004', storeName: '마포점', totalSales: 22_400_000, cardRatio: 0.69, transactionCount: 720,  avgAmount: 31111 },
-  { storeId: 'STORE-005', storeName: '종로점', totalSales: 19_000_000, cardRatio: 0.74, transactionCount: 580,  avgAmount: 32758 },
+  { storeId: 'STORE-003', storeName: '송파점', totalSales: 28_600_000, cardRatio: 0.71, transactionCount: 890, avgAmount: 32135 },
+  { storeId: 'STORE-004', storeName: '마포점', totalSales: 22_400_000, cardRatio: 0.69, transactionCount: 720, avgAmount: 31111 },
+  { storeId: 'STORE-005', storeName: '종로점', totalSales: 19_000_000, cardRatio: 0.74, transactionCount: 580, avgAmount: 32758 },
 ];
 
 // --- 시간대별 매출 현황 ---
 const MAX_SLOT_SALES = 44_800_000;
 const TIME_SLOTS = [
-  { key: 'morning',   label: '오전 09-12시', sales: 21_500_000, barRatio: 21_500_000 / MAX_SLOT_SALES, cardRatio: 0.71 },
-  { key: 'lunch',     label: '점심 12-14시', sales: 38_200_000, barRatio: 38_200_000 / MAX_SLOT_SALES, cardRatio: 0.83 },
-  { key: 'afternoon', label: '오후 14-18시', sales: 44_800_000, barRatio: 1,                            cardRatio: 0.76 },
-  { key: 'evening',   label: '저녁 18-21시', sales: 27_500_000, barRatio: 27_500_000 / MAX_SLOT_SALES, cardRatio: 0.80 },
-  { key: 'night',     label: '야간 21시-',   sales:  4_000_000, barRatio:  4_000_000 / MAX_SLOT_SALES, cardRatio: 0.62 },
+  { key: 'morning', label: '오전 09-12시', sales: 21_500_000, barRatio: 21_500_000 / MAX_SLOT_SALES, cardRatio: 0.71 },
+  { key: 'lunch', label: '점심 12-14시', sales: 38_200_000, barRatio: 38_200_000 / MAX_SLOT_SALES, cardRatio: 0.83 },
+  { key: 'afternoon', label: '오후 14-18시', sales: 44_800_000, barRatio: 1, cardRatio: 0.76 },
+  { key: 'evening', label: '저녁 18-21시', sales: 27_500_000, barRatio: 27_500_000 / MAX_SLOT_SALES, cardRatio: 0.80 },
+  { key: 'night', label: '야간 21시-', sales: 4_000_000, barRatio: 4_000_000 / MAX_SLOT_SALES, cardRatio: 0.62 },
 ];
 
 // --- 결제수단별 전주 대비 ---
 const WOW_DATA = [
-  { paymentType: 'CARD',  paymentName: '카드',   sales: 97_200_000, change:  6.2 },
-  { paymentType: 'CASH',  paymentName: '현금',   sales: 22_400_000, change: -7.1 },
-  { paymentType: 'POINT', paymentName: '포인트', sales: 11_800_000, change:  8.3 },
-  { paymentType: 'ETC',   paymentName: '기타',   sales:  4_600_000, change: -4.2 },
+  { paymentType: 'CARD', paymentName: '카드', sales: 97_200_000, change: 6.2 },
+  { paymentType: 'CASH', paymentName: '현금', sales: 22_400_000, change: -7.1 },
+  { paymentType: 'POINT', paymentName: '포인트', sales: 11_800_000, change: 8.3 },
+  { paymentType: 'ETC', paymentName: '기타', sales: 4_600_000, change: -4.2 },
 ];
 
 export default function SettlementPage() {
-  useSetPageMeta('CR정산서 — 결제수단별 실적', '결제수단별 매출 구조 분석');
   const { currentUser, can } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('period');
   const [startDate, setStartDate] = useState('2025-01-01');
@@ -67,24 +66,29 @@ export default function SettlementPage() {
   const [selectedStores, setSelectedStores] = useState<string[]>([]);
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
 
+  useSetPageMeta(
+    'CR정산서 — 결제수단별 실적',
+    viewMode === 'daily' ? '금일 단건 정산 분석' : '선택 기간 매출 구조 및 추이 분석',
+  );
+
   const storeMode = currentUser ? shouldShowStoreSelector(currentUser.role) : 'hidden';
 
   useSetPageFilters(
     <div className="flex flex-wrap gap-4 items-end">
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">조회 방식</span>
-        <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+        <span className="text-xs text-slate-500 font-medium">조회 방식</span>
+        <div className="flex bg-slate-100 rounded-lg p-0.5 gap-0.5">
           <button
             type="button"
             onClick={() => setViewMode('daily')}
-            className={`px-4 py-2 text-sm transition-colors ${viewMode === 'daily' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-[var(--transition-fast)] ${viewMode === 'daily' ? 'bg-white text-gray-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             데일리
           </button>
           <button
             type="button"
             onClick={() => setViewMode('period')}
-            className={`px-4 py-2 text-sm transition-colors ${viewMode === 'period' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+            className={`px-4 py-1.5 rounded-md text-sm font-medium transition-all duration-[var(--transition-fast)] ${viewMode === 'period' ? 'bg-white text-gray-800 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
           >
             기간별
           </button>
@@ -121,8 +125,8 @@ export default function SettlementPage() {
     selectedPayments.length === 0
       ? DUMMY_SETTLEMENT.breakdown
       : DUMMY_SETTLEMENT.breakdown.filter((b) =>
-          selectedPayments.includes(b.paymentType)
-        );
+        selectedPayments.includes(b.paymentType)
+      );
 
   const totalSales = filteredBreakdown.reduce((s, b) => s + b.sales, 0);
   const totalCount = filteredBreakdown.reduce((s, b) => s + b.count, 0);
@@ -133,15 +137,15 @@ export default function SettlementPage() {
       {/* Row 1: 도넛 차트 + 정산서 + KPI */}
       <div className="grid grid-cols-2 gap-4">
         {/* 도넛 차트 */}
-        <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">결제수단별 구성비</h2>
+        <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">결제수단별 구성비</h2>
           <PaymentDonutChart breakdown={filteredBreakdown} />
         </div>
 
         {/* 정산서 테이블 + KPI 세로 컬럼 */}
         <div className="flex gap-3 items-stretch">
           {/* 정산서 테이블 */}
-          <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+          <div className="flex-1 min-w-0 bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-sm font-semibold text-gray-700">정산서</h2>
               {can('EXPORT_DATA') && (
@@ -192,7 +196,7 @@ export default function SettlementPage() {
           <div className="w-48 shrink-0 grid grid-rows-3 gap-2">
 
             {/* 총 매출액 */}
-            <div className="bg-white rounded-lg border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] flex flex-col overflow-hidden">
               <div className="px-4 py-2.5 flex items-center gap-2 bg-blue-50/60 border-b border-blue-100/60">
                 <span className="w-5 h-5 rounded-md bg-blue-100 flex items-center justify-center shrink-0">
                   <Banknote size={11} className="text-blue-600" />
@@ -210,7 +214,7 @@ export default function SettlementPage() {
             </div>
 
             {/* 총 결제 건수 */}
-            <div className="bg-white rounded-lg border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] flex flex-col overflow-hidden">
               <div className="px-4 py-2.5 flex items-center gap-2 bg-emerald-50/60 border-b border-emerald-100/60">
                 <span className="w-5 h-5 rounded-md bg-emerald-100 flex items-center justify-center shrink-0">
                   <Receipt size={11} className="text-emerald-600" />
@@ -230,7 +234,7 @@ export default function SettlementPage() {
             </div>
 
             {/* 건당 평균 금액 */}
-            <div className="bg-white rounded-lg border border-gray-100 shadow-sm flex flex-col overflow-hidden">
+            <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] flex flex-col overflow-hidden">
               <div className="px-4 py-2.5 flex items-center gap-2 bg-violet-50/60 border-b border-violet-100/60">
                 <span className="w-5 h-5 rounded-md bg-violet-100 flex items-center justify-center shrink-0">
                   <BarChart2 size={11} className="text-violet-600" />
@@ -255,8 +259,8 @@ export default function SettlementPage() {
       <div className="grid grid-cols-5 gap-4">
 
         {/* 매장별 정산 현황 */}
-        <div className="col-span-3 bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">매장별 정산 현황</h2>
+        <div className="col-span-3 bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">매장별 정산 현황</h2>
           <Table<StoreRow>
             columns={[
               { key: 'storeName', header: '매장' },
@@ -302,8 +306,8 @@ export default function SettlementPage() {
         </div>
 
         {/* 시간대별 매출 분포 */}
-        <div className="col-span-2 bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-4">시간대별 매출 현황</h2>
+        <div className="col-span-2 bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-4">시간대별 매출 현황</h2>
           <div className="flex flex-col gap-3.5">
             {TIME_SLOTS.map((slot) => (
               <div key={slot.key}>
@@ -332,14 +336,13 @@ export default function SettlementPage() {
         {WOW_DATA.map((item) => {
           const isUp = item.change >= 0;
           return (
-            <div key={item.paymentType} className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+            <div key={item.paymentType} className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
               <div className="flex items-center justify-between mb-3">
                 <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide">
                   {item.paymentName}
                 </span>
-                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
-                  isUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
-                }`}>
+                <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${isUp ? 'bg-emerald-50 text-emerald-600' : 'bg-red-50 text-red-500'
+                  }`}>
                   {isUp ? '▲' : '▼'} {Math.abs(item.change).toFixed(1)}%
                 </span>
               </div>
@@ -362,9 +365,18 @@ export default function SettlementPage() {
 
       {/* Row 4: 기간별 추이 차트 */}
       {viewMode === 'period' && (
-        <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">기간별 결제수단 추이</h2>
+        <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">기간별 결제수단 추이</h2>
           <PaymentStackBarChart dailyTrend={DUMMY_SETTLEMENT.dailyTrend} />
+        </div>
+      )}
+
+      {viewMode === 'daily' && (
+        <div className="bg-primary-50/50 rounded-[var(--radius-card)] border border-primary-100 p-4 shadow-[var(--shadow-card)]">
+          <p className="text-xs text-primary-600 font-medium flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary-500 animate-pulse" />
+            데일리 모드: 금일 단건 정산 데이터를 표시합니다. 선택한 날짜의 매출 구성 및 매장별 현황을 확인하세요.
+          </p>
         </div>
       )}
 

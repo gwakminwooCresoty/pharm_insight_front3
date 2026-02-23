@@ -89,16 +89,16 @@ export default function PosStatisticsPage() {
           label="조회 기간"
         />
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-gray-500 font-medium">조회 축</span>
-          <div className="flex gap-1">
+          <span className="text-xs text-slate-500 font-medium">조회 축</span>
+          <div className="flex bg-slate-100 rounded-lg p-0.5 gap-0.5">
             {AXIS_OPTIONS.map((opt) => (
               <button
                 key={opt.value}
                 type="button"
                 onClick={() => setAxisType(opt.value)}
-                className={`px-3 py-2 rounded-lg text-sm border transition-colors ${axisType === opt.value
-                    ? 'bg-blue-600 text-white border-blue-600'
-                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-[var(--transition-fast)] ${axisType === opt.value
+                  ? 'bg-white text-gray-800 shadow-sm'
+                  : 'text-slate-500 hover:text-slate-700'
                   }`}
               >
                 {opt.label}
@@ -116,11 +116,11 @@ export default function PosStatisticsPage() {
           />
         )}
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-gray-500 font-medium">상품 분류</span>
+          <span className="text-xs text-slate-500 font-medium">상품 분류</span>
           <select
             value={category}
             onChange={(e) => setCategory(e.target.value as CategoryCode)}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all duration-[var(--transition-fast)]"
           >
             {CATEGORY_OPTIONS.map((opt) => (
               <option key={opt.value} value={opt.value}>
@@ -144,9 +144,8 @@ export default function PosStatisticsPage() {
         )}
       </div>
       <div
-        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
-          showCompare && activeTab === 'date' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
-        }`}
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${showCompare && activeTab === 'date' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+          }`}
       >
         <div className="overflow-hidden">
           <div className="mt-3 pt-3 border-t border-gray-100">
@@ -168,14 +167,14 @@ export default function PosStatisticsPage() {
       <div className="flex gap-3 items-start">
 
         {/* 탭 패널 — 메인 콘텐츠 */}
-        <div className="flex-1 min-w-0 bg-white rounded-lg border border-gray-100 shadow-sm">
-          <div className="flex border-b border-gray-200">
+        <div className="flex-1 min-w-0 bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)]">
+          <div className="flex border-b border-slate-200">
             <button
               type="button"
               onClick={() => setActiveTab('item')}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'item'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors duration-[var(--transition-fast)] ${activeTab === 'item'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-slate-400 hover:text-slate-700'
                 }`}
             >
               상품별 통계
@@ -183,9 +182,9 @@ export default function PosStatisticsPage() {
             <button
               type="button"
               onClick={() => setActiveTab('date')}
-              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors ${activeTab === 'date'
-                  ? 'border-blue-600 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+              className={`px-5 py-3 text-sm font-medium border-b-2 transition-colors duration-[var(--transition-fast)] ${activeTab === 'date'
+                ? 'border-primary-600 text-primary-600'
+                : 'border-transparent text-slate-400 hover:text-slate-700'
                 }`}
             >
               일자별 통계

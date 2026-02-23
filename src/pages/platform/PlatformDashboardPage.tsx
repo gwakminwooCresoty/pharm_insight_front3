@@ -54,12 +54,12 @@ export default function PlatformDashboardPage() {
         {/* 좌측 세로 KPI 카드 (1열 차지) */}
         <div className="lg:col-span-1 flex flex-col gap-3 h-full">
           {/* 플랫폼 총 매출 */}
-          <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-3.5 flex items-center gap-3.5 flex-1 w-full">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center shrink-0">
-              <TrendingUp size={18} className="text-blue-500" />
+          <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow duration-[var(--transition-normal)] p-3.5 flex items-center gap-3.5 flex-1 w-full">
+            <div className="w-10 h-10 rounded-xl bg-primary-50 flex items-center justify-center shrink-0">
+              <TrendingUp size={18} className="text-primary-500" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">플랫폼 총 매출</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">플랫폼 총 매출</p>
               <div className="flex items-end justify-between">
                 <p className="text-lg font-bold text-gray-900 leading-none truncate">
                   {formatKRW(DUMMY_PLATFORM_KPI.totalSales)}
@@ -72,12 +72,12 @@ export default function PlatformDashboardPage() {
           </div>
 
           {/* 총 객수 */}
-          <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-3.5 flex items-center gap-3.5 flex-1 w-full">
+          <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow duration-[var(--transition-normal)] p-3.5 flex items-center gap-3.5 flex-1 w-full">
             <div className="w-10 h-10 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
               <Users size={18} className="text-teal-500" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">총 객수</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">총 객수</p>
               <div className="flex items-end justify-between">
                 <p className="text-lg font-bold text-gray-900 leading-none truncate">
                   {formatNumber(DUMMY_PLATFORM_KPI.totalCustomerCount)}명
@@ -90,12 +90,12 @@ export default function PlatformDashboardPage() {
           </div>
 
           {/* 활성 프랜차이즈 */}
-          <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-3.5 flex items-center gap-3.5 flex-1 w-full">
+          <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow duration-[var(--transition-normal)] p-3.5 flex items-center gap-3.5 flex-1 w-full">
             <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center shrink-0">
               <Building2 size={18} className="text-amber-500" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">활성 프랜차이즈</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">활성 프랜차이즈</p>
               <div className="flex items-end justify-between">
                 <p className="text-lg font-bold text-gray-900 leading-none truncate">
                   {DUMMY_PLATFORM_KPI.activeFranchiseCount}개
@@ -108,12 +108,12 @@ export default function PlatformDashboardPage() {
           </div>
 
           {/* 활성 매장 */}
-          <div className="bg-white rounded-lg border border-gray-100 shadow-sm p-3.5 flex items-center gap-3.5 flex-1 w-full">
+          <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 shadow-[var(--shadow-card)] hover:shadow-[var(--shadow-card-hover)] transition-shadow duration-[var(--transition-normal)] p-3.5 flex items-center gap-3.5 flex-1 w-full">
             <div className="w-10 h-10 rounded-xl bg-violet-50 flex items-center justify-center shrink-0">
               <Store size={18} className="text-violet-500" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wide mb-1">활성 매장</p>
+              <p className="text-[11px] font-semibold text-slate-400 uppercase tracking-wide mb-1">활성 매장</p>
               <div className="flex items-end justify-between">
                 <p className="text-lg font-bold text-gray-900 leading-none truncate">
                   {DUMMY_PLATFORM_KPI.activeStoreCount}개
@@ -128,8 +128,8 @@ export default function PlatformDashboardPage() {
         </div>
 
         {/* 우측 메인 차트 (3열 차지) */}
-        <div className="lg:col-span-3 bg-white rounded-lg border border-gray-100 p-4 shadow-sm flex flex-col h-full">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3 shrink-0">
+        <div className="lg:col-span-3 bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)] flex flex-col h-full">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3 shrink-0">
             플랫폼 전체 매출 추이
           </h2>
           <div className="flex-1 min-h-[300px]">
@@ -140,8 +140,8 @@ export default function PlatformDashboardPage() {
 
       <div className="grid grid-cols-1 gap-4">
         {/* 프랜차이즈 랭킹 차트 */}
-        <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+        <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+          <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">
             프랜차이즈별 매출 랭킹
           </h2>
           <FranchiseRankBarChart franchises={DUMMY_FRANCHISES} />
@@ -149,15 +149,15 @@ export default function PlatformDashboardPage() {
       </div>
 
       {/* 프랜차이즈 랭킹 테이블 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">프랜차이즈 현황</h2>
+      <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wide mb-3">프랜차이즈 현황</h2>
         <Table<FranchiseSummary>
           columns={[
             {
               key: 'salesRank',
               header: '순위',
               render: (row) => (
-                <span className="font-bold text-blue-600">#{row.salesRank}</span>
+                <span className="font-bold text-primary-600">#{row.salesRank}</span>
               ),
             },
             { key: 'franchiseName', header: '프랜차이즈명' },

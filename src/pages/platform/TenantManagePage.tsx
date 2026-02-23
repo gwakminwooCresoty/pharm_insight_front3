@@ -63,7 +63,7 @@ function TenantFilterBar({
   return (
     <div className="flex gap-3 items-end">
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">프랜차이즈명</span>
+        <span className="text-xs text-slate-500 font-medium">프랜차이즈명</span>
         <input
           type="text"
           value={keyword}
@@ -71,15 +71,15 @@ function TenantFilterBar({
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
           placeholder="이름 검색"
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         />
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">상태</span>
+        <span className="text-xs text-slate-500 font-medium">상태</span>
         <select
           value={status}
           onChange={(e) => setStatus(e.target.value)}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         >
           <option value="">전체</option>
           <option value="ACTIVE">활성</option>
@@ -205,7 +205,7 @@ export default function TenantManagePage() {
   return (
     <PageContainer>
       {/* 테이블 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+      <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
         <Table<FranchiseSummary>
           columns={[
             { key: 'franchiseId', header: 'ID', className: 'font-mono text-xs' },
@@ -363,7 +363,7 @@ export default function TenantManagePage() {
             <label className="text-sm font-medium text-gray-700">변경할 상태</label>
             <select
               {...registerStatus('status', { required: true })}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             >
               <option value="ACTIVE">활성 (ACTIVE)</option>
               <option value="INACTIVE">비활성 (INACTIVE)</option>
@@ -376,7 +376,7 @@ export default function TenantManagePage() {
               type="text"
               {...registerStatus('reason')}
               placeholder="상태 변경 사유 입력"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             />
           </div>
           <div className="flex gap-2 justify-end mt-2">
@@ -445,7 +445,7 @@ function FranchiseForm({ onSubmit, onCancel, register, handleSubmit, errors, isC
             type="text"
             {...register('franchiseName', { required: '필수 입력항목입니다.' })}
             placeholder="○○약국 체인"
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
           />
           {errors.franchiseName && (
             <span className="text-xs text-red-500">{errors.franchiseName.message}</span>
@@ -457,7 +457,7 @@ function FranchiseForm({ onSubmit, onCancel, register, handleSubmit, errors, isC
             type="text"
             {...register('bizRegNo', { required: '필수 입력항목입니다.' })}
             placeholder="000-00-00000"
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
           />
           {errors.bizRegNo && (
             <span className="text-xs text-red-500">{errors.bizRegNo.message}</span>
@@ -469,7 +469,7 @@ function FranchiseForm({ onSubmit, onCancel, register, handleSubmit, errors, isC
             type="text"
             {...register('representativeName', { required: '필수 입력항목입니다.' })}
             placeholder="홍길동"
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
           />
           {errors.representativeName && (
             <span className="text-xs text-red-500">{errors.representativeName.message}</span>
@@ -480,7 +480,7 @@ function FranchiseForm({ onSubmit, onCancel, register, handleSubmit, errors, isC
           <input
             type="date"
             {...register('contractStartDate', { required: '필수 입력항목입니다.' })}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
           />
         </div>
         <div className="flex flex-col gap-1.5">
@@ -488,7 +488,7 @@ function FranchiseForm({ onSubmit, onCancel, register, handleSubmit, errors, isC
           <input
             type="date"
             {...register('contractEndDate', { required: '필수 입력항목입니다.' })}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
           />
         </div>
         {isCreate && (
@@ -498,7 +498,7 @@ function FranchiseForm({ onSubmit, onCancel, register, handleSubmit, errors, isC
               type="email"
               {...register('adminEmail', { required: isCreate ? '필수 입력항목입니다.' : false })}
               placeholder="admin@franchise.com"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             />
             {errors.adminEmail && (
               <span className="text-xs text-red-500">{errors.adminEmail.message}</span>

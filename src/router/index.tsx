@@ -1,4 +1,5 @@
 import { createBrowserRouter, Navigate, useLocation } from 'react-router-dom';
+import { Ban } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import AppLayout from '@/components/layout/AppLayout';
 import LoginPage from '@/pages/LoginPage';
@@ -38,9 +39,11 @@ function RoleGuard({
     return (
       <div className="flex items-center justify-center h-full">
         <div className="text-center">
-          <div className="text-4xl mb-3">🚫</div>
+          <div className="flex justify-center mb-3">
+            <Ban size={36} className="text-slate-300" />
+          </div>
           <h2 className="text-lg font-semibold text-gray-800">접근 권한 없음</h2>
-          <p className="text-sm text-gray-500 mt-1">
+          <p className="text-sm text-slate-500 mt-1">
             이 페이지에 접근할 권한이 없습니다. (403 Forbidden)
           </p>
         </div>

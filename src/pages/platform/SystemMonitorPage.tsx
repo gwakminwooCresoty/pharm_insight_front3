@@ -15,12 +15,12 @@ export default function SystemMonitorPage() {
         <PageContainer>
             {/* 인프라 상태 모니터링 (가상 데이터) */}
             <h2 className="text-sm font-bold text-gray-800 mb-3 flex items-center gap-2">
-                <Server size={18} className="text-blue-600" />
+                <Server size={18} className="text-primary-600" />
                 인프라 상태
             </h2>
             <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
                 {/* API 서버 상태 */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between">
+                <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-5 shadow-[var(--shadow-card)] flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
                             <Activity size={18} />
@@ -34,7 +34,7 @@ export default function SystemMonitorPage() {
                 </div>
 
                 {/* DB 상태 */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between">
+                <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-5 shadow-[var(--shadow-card)] flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-8 h-8 rounded-lg bg-green-50 text-green-600 flex items-center justify-center">
                             <Database size={18} />
@@ -48,7 +48,7 @@ export default function SystemMonitorPage() {
                 </div>
 
                 {/* 메모리 사용량 */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between">
+                <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-5 shadow-[var(--shadow-card)] flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-8 h-8 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center">
                             <Server size={18} />
@@ -65,7 +65,7 @@ export default function SystemMonitorPage() {
                 </div>
 
                 {/* 에러 발생률 */}
-                <div className="bg-white rounded-xl border border-gray-200 p-5 flex flex-col justify-between">
+                <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-5 shadow-[var(--shadow-card)] flex flex-col justify-between">
                     <div className="flex items-center justify-between mb-4">
                         <div className="w-8 h-8 rounded-lg bg-red-50 text-red-600 flex items-center justify-center">
                             <ServerCrash size={18} />
@@ -84,7 +84,7 @@ export default function SystemMonitorPage() {
                 <AlertTriangle size={18} className="text-red-500" />
                 가맹점 매출 이상 징후
             </h2>
-            <div className="bg-white border border-gray-200 rounded-xl p-5 shadow-sm">
+            <div className="bg-white border border-slate-100 rounded-[var(--radius-card)] p-5 shadow-[var(--shadow-card)]">
                 {DUMMY_ANOMALIES.length > 0 ? (
                     <>
                         <p className="text-sm text-gray-500 mb-4">

@@ -4,6 +4,7 @@ import PageContainer from '@/components/layout/PageContainer';
 import StoreMap from '@/components/map/StoreMap';
 import { DUMMY_STORES } from '@/data/platform.dummy';
 import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
+import { useAuth } from '@/hooks/useAuth';
 
 // StoreMap의 FRANCHISE_COLORS와 동일한 순서의 hex 색상
 const FRANCHISE_FILLS = ['#2563eb', '#4f46e5', '#059669', '#d97706', '#e11d48'];
@@ -11,15 +12,31 @@ const getColorIndex = (id: string) =>
     parseInt(id.replace(/\D/g, '') || '0', 10) % FRANCHISE_FILLS.length;
 
 export default function PlatformInsightMapPage() {
-    useSetPageMeta('가맹점 인사이트 맵', '전국 프랜차이즈 매장 분포 및 활성 상태 현황');
+    const { currentUser } = useAuth();
+    const isPlatformAdmin = currentUser?.role === 'PLATFORM_ADMIN';
+
+    useSetPageMeta(
+        '가맹점 인사이트 맵',
+        isPlatformAdmin
+            ? '전국 프랜차이즈 매장 분포 및 활성 상태 현황'
+            : `${currentUser?.franchiseName ?? ''} 소속 매장 분포 현황`,
+    );
+
+    // 비-플랫폼 관리자는 자기 프랜차이즈 매장만 볼 수 있음
+    const accessibleStores = useMemo(() => {
+        if (isPlatformAdmin) return DUMMY_STORES;
+        const franchiseId = currentUser?.franchiseId;
+        if (!franchiseId) return [];
+        return DUMMY_STORES.filter(s => s.franchiseId === franchiseId);
+    }, [isPlatformAdmin, currentUser?.franchiseId]);
 
     const availableFranchises = useMemo(() => {
         const map = new globalThis.Map<string, string>();
-        DUMMY_STORES.forEach(s => {
+        accessibleStores.forEach(s => {
             if (!map.has(s.franchiseId)) map.set(s.franchiseId, s.franchiseName);
         });
         return Array.from(map.entries()).map(([id, name]) => ({ id, name }));
-    }, []);
+    }, [accessibleStores]);
 
     const [selectedFranchiseIds, setSelectedFranchiseIds] = useState<Set<string>>(
         new Set(availableFranchises.map(f => f.id))
@@ -37,8 +54,8 @@ export default function PlatformInsightMapPage() {
     const clearAll = () => setSelectedFranchiseIds(new Set());
 
     const filteredStores = useMemo(
-        () => DUMMY_STORES.filter(store => selectedFranchiseIds.has(store.franchiseId)),
-        [selectedFranchiseIds],
+        () => accessibleStores.filter(store => selectedFranchiseIds.has(store.franchiseId)),
+        [accessibleStores, selectedFranchiseIds],
     );
 
     const allSelected = selectedFranchiseIds.size === availableFranchises.length;
@@ -53,31 +70,33 @@ export default function PlatformInsightMapPage() {
                 <span>개 표시 중</span>
             </div>
 
-            {/* 전체 / 해제 */}
-            <button
-                type="button"
-                onClick={selectAll}
-                className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-                    allSelected
-                        ? 'bg-blue-600 text-white border-blue-600'
-                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                }`}
-            >
-                전체
-            </button>
-            <button
-                type="button"
-                onClick={clearAll}
-                className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${
-                    noneSelected
-                        ? 'bg-gray-200 text-gray-500 border-gray-200'
-                        : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
-                }`}
-            >
-                해제
-            </button>
+            {/* 전체 / 해제 — 플랫폼 관리자만 멀티 프랜차이즈 토글 가능 */}
+            {isPlatformAdmin && (
+                <>
+                    <button
+                        type="button"
+                        onClick={selectAll}
+                        className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${allSelected
+                                ? 'bg-primary-600 text-white ring-primary-600 shadow-sm'
+                                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                            }`}
+                    >
+                        전체
+                    </button>
+                    <button
+                        type="button"
+                        onClick={clearAll}
+                        className={`px-2.5 py-1.5 text-xs font-medium rounded-md border transition-colors ${noneSelected
+                                ? 'bg-gray-200 text-gray-500 border-gray-200'
+                                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'
+                            }`}
+                    >
+                        해제
+                    </button>
 
-            <div className="w-px h-5 bg-gray-200 mx-0.5" />
+                    <div className="w-px h-5 bg-gray-200 mx-0.5" />
+                </>
+            )}
 
             {/* 프랜차이즈 필터 칩 */}
             {availableFranchises.map(f => {
@@ -88,11 +107,10 @@ export default function PlatformInsightMapPage() {
                         key={f.id}
                         type="button"
                         onClick={() => toggleFranchise(f.id)}
-                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${
-                            isSelected
+                        className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all ${isSelected
                                 ? 'bg-white border-gray-300 text-gray-800 shadow-sm'
                                 : 'bg-white border-gray-100 text-gray-400'
-                        }`}
+                            }`}
                     >
                         <span
                             className="w-2 h-2 rounded-full shrink-0"

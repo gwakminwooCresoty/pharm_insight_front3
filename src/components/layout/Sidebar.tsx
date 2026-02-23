@@ -61,9 +61,11 @@ const PLATFORM_MENU_ITEMS: MenuItem[] = [
 ];
 
 const linkBase =
-  'flex items-center gap-2.5 px-3 py-2 rounded-md text-[13px] font-medium transition-colors';
-const linkActive = 'bg-blue-600 text-white';
-const linkIdle = 'text-slate-400 hover:bg-slate-800 hover:text-slate-200';
+  'flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] font-medium transition-all duration-[var(--transition-fast)] relative';
+const linkActive =
+  'bg-primary-600/15 text-white before:absolute before:left-0 before:top-1/2 before:-translate-y-1/2 before:w-[3px] before:h-5 before:rounded-r-full before:bg-primary-500';
+const linkIdle =
+  'text-slate-400 hover:bg-slate-800/50 hover:text-slate-200';
 
 export default function Sidebar() {
   const { currentUser } = useAuth();
@@ -85,27 +87,27 @@ export default function Sidebar() {
     : [];
 
   return (
-    <aside className="w-48 bg-slate-900 text-white flex flex-col shrink-0">
+    <aside className="w-48 bg-[var(--color-sidebar-bg)] text-white flex flex-col shrink-0">
       {/* 로고 */}
-      <div className="px-4 py-4 border-b border-slate-700/60">
+      <div className="px-4 py-4 border-b border-slate-700/40">
         <div className="flex items-center gap-2.5">
           {/* 약국 십자 로고마크 */}
-          <div className="w-7 h-7 bg-blue-600 rounded-lg flex items-center justify-center shrink-0">
+          <div className="w-8 h-8 bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary-600/20">
             <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
               <rect x="5.5" y="1" width="3" height="12" rx="1" fill="white" />
               <rect x="1" y="5.5" width="12" height="3" rx="1" fill="white" />
             </svg>
           </div>
-          <span className="font-bold text-[14px] tracking-tight text-white leading-tight">
+          <span className="font-bold text-[15px] tracking-tight text-white leading-tight">
             {BRANDING.serviceName}
           </span>
         </div>
-        <p className="text-[10px] text-slate-500 mt-1 pl-9">POS 분석 플랫폼</p>
+        <p className="text-[10px] text-slate-500 mt-1.5 pl-[42px]">POS 분석 플랫폼</p>
       </div>
 
       {/* 메뉴 */}
       <nav className="flex-1 overflow-y-auto py-3 px-2 flex flex-col gap-0.5">
-        <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-2 py-1.5">
+        <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-2 py-1.5">
           업무
         </p>
         {visibleMenu.map((item) => (
@@ -123,7 +125,7 @@ export default function Sidebar() {
 
         {visiblePlatformMenu.length > 0 && (
           <>
-            <p className="text-[10px] font-semibold text-slate-600 uppercase tracking-wider px-2 py-1.5 mt-3">
+            <p className="text-[10px] font-semibold text-slate-500 uppercase tracking-wider px-2 py-1.5 mt-3">
               플랫폼 관리
             </p>
             {visiblePlatformMenu.map((item) => (
@@ -143,9 +145,9 @@ export default function Sidebar() {
       </nav>
 
       {/* 하단 사용자 요약 */}
-      <div className="px-3 py-3 border-t border-slate-700/60">
-        <p className="text-[11px] text-slate-400 truncate">{currentUser.name}</p>
-        <p className="text-[10px] text-slate-600 truncate mt-0.5">
+      <div className="px-3 py-3 border-t border-slate-700/40">
+        <p className="text-[11px] text-slate-300 truncate">{currentUser.name}</p>
+        <p className="text-[10px] text-slate-500 truncate mt-0.5">
           {currentUser.franchiseName ?? '플랫폼'}
         </p>
       </div>

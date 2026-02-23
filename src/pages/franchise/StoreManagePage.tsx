@@ -1,19 +1,35 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import PageContainer from '@/components/layout/PageContainer';
 import Badge from '@/components/ui/Badge';
 import Button from '@/components/ui/Button';
 import StoreMap from '@/components/map/StoreMap';
 import { useSetPageMeta } from '@/hooks/usePageMeta';
+import { useAuth } from '@/hooks/useAuth';
 import { DUMMY_STORES, type Store } from '@/data/platform.dummy';
 
 export default function StoreManagePage() {
-    useSetPageMeta('프랜차이즈 매장 관리', '가맹점 리스트 조회 및 지도 뷰');
-    const [stores] = useState<Store[]>(DUMMY_STORES);
+    const { currentUser } = useAuth();
+    const isPlatformAdmin = currentUser?.role === 'PLATFORM_ADMIN';
+
+    useSetPageMeta(
+        isPlatformAdmin ? '전체 매장 관리' : `${currentUser?.franchiseName ?? ''} 매장 관리`,
+        isPlatformAdmin ? '전체 프랜차이즈 가맹점 조회' : `${currentUser?.franchiseName ?? ''} 소속 매장 조회 및 지도 뷰`,
+    );
+
+    // 프랜차이즈 관리자는 자기 프랜차이즈 매장만 볼 수 있음
+    // 실제 운영 시 API 레벨에서 통제되며, 여기서는 더미 데이터를 프론트에서 필터링
+    const accessibleStores = useMemo(() => {
+        if (isPlatformAdmin) return DUMMY_STORES;
+        const franchiseId = currentUser?.franchiseId;
+        if (!franchiseId) return [];
+        return DUMMY_STORES.filter(s => s.franchiseId === franchiseId);
+    }, [isPlatformAdmin, currentUser?.franchiseId]);
+
     const [keyword, setKeyword] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
     const [selectedStore, setSelectedStore] = useState<Store | null>(null);
 
-    const filteredStores = stores.filter((s) => {
+    const filteredStores = accessibleStores.filter((s) => {
         if (keyword && !s.storeName.includes(keyword) && !s.address.includes(keyword)) return false;
         if (statusFilter && s.status !== statusFilter) return false;
         return true;
@@ -24,20 +40,20 @@ export default function StoreManagePage() {
             <div className="flex flex-col lg:flex-row gap-4 h-[calc(100vh-140px)] min-h-[600px]">
 
                 {/* 좌측 리스트 뷰 */}
-                <div className="flex flex-col gap-3 w-full lg:w-1/3 bg-white border border-gray-100 rounded-lg p-4 shadow-sm">
+                <div className="flex flex-col gap-3 w-full lg:w-1/3 bg-white border border-slate-100 rounded-[var(--radius-card)] p-5 shadow-[var(--shadow-card)]">
                     <div className="flex flex-col gap-2">
                         <input
                             type="text"
                             placeholder="매장명 또는 주소 검색"
                             value={keyword}
                             onChange={(e) => setKeyword(e.target.value)}
-                            className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                            className="w-full ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
                         />
                         <div className="flex gap-2">
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                className="w-full ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
                             >
                                 <option value="">전체 상태</option>
                                 <option value="ACTIVE">운영중</option>
@@ -49,6 +65,11 @@ export default function StoreManagePage() {
 
                     <div className="text-sm font-medium text-gray-700 mt-2">
                         검색 결과 {filteredStores.length}건
+                        {!isPlatformAdmin && currentUser?.franchiseName && (
+                            <span className="text-xs text-slate-400 ml-2">
+                                ({currentUser.franchiseName})
+                            </span>
+                        )}
                     </div>
 
                     {/* 목록 표시 */}
@@ -57,9 +78,9 @@ export default function StoreManagePage() {
                             <div
                                 key={store.storeId}
                                 onClick={() => setSelectedStore(store)}
-                                className={`p-3 rounded border cursor-pointer transition-colors ${selectedStore?.storeId === store.storeId
-                                    ? 'border-blue-500 bg-blue-50'
-                                    : 'border-gray-200 hover:border-blue-300 hover:bg-slate-50'
+                                className={`p-3 rounded-lg border cursor-pointer transition-colors ${selectedStore?.storeId === store.storeId
+                                    ? 'border-primary-400 bg-primary-50'
+                                    : 'border-slate-200 hover:border-primary-300 hover:bg-slate-50'
                                     }`}
                             >
                                 <div className="flex justify-between items-start mb-1">
@@ -85,7 +106,7 @@ export default function StoreManagePage() {
                 </div>
 
                 {/* 우측 지도 뷰 */}
-                <div className="w-full lg:w-2/3 h-[400px] lg:h-full bg-slate-50 rounded-lg overflow-hidden border border-gray-100 shadow-sm relative">
+                <div className="w-full lg:w-2/3 h-[400px] lg:h-full bg-slate-50 rounded-[var(--radius-card)] overflow-hidden border border-slate-100 shadow-[var(--shadow-card)] relative">
                     {filteredStores.length > 0 ? (
                         <StoreMap
                             stores={filteredStores}

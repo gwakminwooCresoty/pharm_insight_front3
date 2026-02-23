@@ -109,7 +109,7 @@ function GroupForm({
           type="text"
           {...register('name', { required: '필수 입력항목입니다.' })}
           placeholder="예: 프리미엄 분석 그룹"
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         />
         {errors.name && (
           <span className="text-xs text-red-500">{errors.name.message}</span>
@@ -121,7 +121,7 @@ function GroupForm({
           type="text"
           {...register('description')}
           placeholder="이 그룹의 목적을 간략히 설명해주세요"
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         />
       </div>
       <div className="flex flex-col gap-2">
@@ -158,13 +158,13 @@ export default function PermissionGroupPage() {
   useSetPageFilters(
     <div className="flex gap-3 items-end">
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">그룹명</span>
+        <span className="text-xs text-slate-500 font-medium">그룹명</span>
         <input
           type="text"
           value={keyword}
           onChange={(e) => setKeyword(e.target.value)}
           placeholder="그룹명 검색"
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         />
       </div>
       <div className="ml-auto">
@@ -233,7 +233,7 @@ export default function PermissionGroupPage() {
     <PageContainer>
       {/* 통계 요약 행 */}
       <div className="grid grid-cols-3 gap-4">
-        <div className="bg-white rounded-lg border border-gray-100 px-5 py-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 px-5 py-4 shadow-[var(--shadow-card)] flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-blue-50 flex items-center justify-center shrink-0">
             <ShieldCheck size={18} className="text-blue-600" />
           </div>
@@ -242,7 +242,7 @@ export default function PermissionGroupPage() {
             <div className="text-2xl font-bold text-gray-900">{groups.length}개</div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-100 px-5 py-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 px-5 py-4 shadow-[var(--shadow-card)] flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-slate-100 flex items-center justify-center shrink-0">
             <Lock size={18} className="text-slate-500" />
           </div>
@@ -253,7 +253,7 @@ export default function PermissionGroupPage() {
             </div>
           </div>
         </div>
-        <div className="bg-white rounded-lg border border-gray-100 px-5 py-4 shadow-sm flex items-center gap-4">
+        <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 px-5 py-4 shadow-[var(--shadow-card)] flex items-center gap-4">
           <div className="w-10 h-10 rounded-lg bg-violet-50 flex items-center justify-center shrink-0">
             <ShieldCheck size={18} className="text-violet-500" />
           </div>
@@ -267,7 +267,7 @@ export default function PermissionGroupPage() {
       </div>
 
       {/* 그룹 테이블 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+      <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
         <Table<PermissionGroup>
           columns={[
             {

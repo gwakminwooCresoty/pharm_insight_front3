@@ -10,7 +10,7 @@ const FRANCHISE_ACCOUNTS = DUMMY_ACCOUNTS.filter((a) => a.role !== 'PLATFORM_ADM
 function PharmLogo({ size = 28 }: { size?: number }) {
   return (
     <div
-      className="bg-blue-600 rounded-xl flex items-center justify-center shrink-0"
+      className="bg-primary-600 rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-primary-600/25"
       style={{ width: size, height: size }}
     >
       <svg
@@ -73,18 +73,21 @@ export default function LoginPage() {
     }, 300);
   }
 
+  const inputClass =
+    'ring-1 ring-slate-200 rounded-xl px-4 py-3 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all duration-[var(--transition-fast)]';
+
   return (
     <div className="min-h-screen bg-slate-50 flex">
       {/* 왼쪽 브랜드 패널 */}
-      <div className="hidden lg:flex w-72 bg-slate-900 flex-col justify-between p-8 shrink-0">
+      <div className="hidden lg:flex w-72 bg-gradient-to-b from-slate-900 via-slate-900 to-primary-950 flex-col justify-between p-8 shrink-0">
         <div>
           <div className="flex items-center gap-3 mb-10">
-            <PharmLogo size={32} />
+            <PharmLogo size={36} />
             <span className="text-white font-bold text-lg tracking-tight">{BRANDING.serviceName}</span>
           </div>
           <h2 className="text-white text-2xl font-bold leading-snug">
             {BRANDING.loginTagline}<br />
-            <span className="text-blue-400">스마트 인사이트</span>
+            <span className="text-primary-400">스마트 인사이트</span>
           </h2>
           <p className="text-slate-400 text-sm mt-4 leading-relaxed">
             데이터 기반 실적 관리,<br />
@@ -97,20 +100,20 @@ export default function LoginPage() {
 
       {/* 오른쪽 로그인 영역 */}
       <div className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-sm">
+        <div className="w-full max-w-sm animate-[slideUp_400ms_ease-out]">
           <div className="lg:hidden text-center mb-6">
             <div className="flex justify-center mb-2">
-              <PharmLogo size={36} />
+              <PharmLogo size={40} />
             </div>
             <h1 className="text-xl font-bold text-gray-900 mt-2">{BRANDING.serviceName}</h1>
           </div>
 
           <h2 className="text-[15px] font-bold text-gray-900 mb-1">로그인</h2>
-          <p className="text-xs text-gray-400 mb-5">역할을 선택하거나 직접 입력하세요.</p>
+          <p className="text-xs text-slate-400 mb-5">역할을 선택하거나 직접 입력하세요.</p>
 
           {/* 빠른 역할 선택 */}
           <div className="mb-5">
-            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+            <p className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider mb-2">
               데모 계정 빠른 선택
             </p>
             <div className="grid grid-cols-2 gap-1.5">
@@ -119,9 +122,9 @@ export default function LoginPage() {
                   key={account.userId}
                   type="button"
                   onClick={() => handleQuickLogin(account.userId)}
-                  className={`text-left px-3 py-2 rounded-lg border text-[12px] transition-all ${selectedAccountId === account.userId
-                    ? 'border-blue-400 bg-blue-50 shadow-sm'
-                    : 'border-gray-200 hover:border-gray-300 bg-white hover:shadow-sm'
+                  className={`text-left px-3 py-2 rounded-lg ring-1 text-[12px] transition-all duration-[var(--transition-fast)] ${selectedAccountId === account.userId
+                    ? 'ring-primary-400 bg-primary-50 shadow-sm'
+                    : 'ring-slate-200 hover:ring-slate-300 bg-white hover:shadow-sm'
                     }`}
                 >
                   <div className="font-semibold text-gray-800 truncate leading-tight">
@@ -133,9 +136,9 @@ export default function LoginPage() {
           </div>
 
           <div className="flex items-center gap-2 mb-4">
-            <div className="h-px bg-gray-200 flex-1" />
-            <span className="text-[11px] text-gray-400">또는 직접 입력</span>
-            <div className="h-px bg-gray-200 flex-1" />
+            <div className="h-px bg-slate-200 flex-1" />
+            <span className="text-[11px] text-slate-400">또는 직접 입력</span>
+            <div className="h-px bg-slate-200 flex-1" />
           </div>
 
           <form onSubmit={handleSubmit} className="flex flex-col gap-3">
@@ -145,7 +148,7 @@ export default function LoginPage() {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="이메일"
               required
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={inputClass}
             />
             <input
               type="password"
@@ -153,7 +156,7 @@ export default function LoginPage() {
               onChange={(e) => setPassword(e.target.value)}
               placeholder="비밀번호"
               required
-              className="border border-gray-200 rounded-lg px-3 py-2.5 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className={inputClass}
             />
             {error && (
               <p className="text-xs text-red-500 text-center">{error}</p>
@@ -161,14 +164,14 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="bg-blue-600 text-white rounded-lg py-2.5 text-sm font-semibold hover:bg-blue-700 disabled:opacity-60 transition-colors shadow-sm"
+              className="bg-primary-600 text-white rounded-xl py-3 text-sm font-semibold hover:bg-primary-700 active:bg-primary-800 disabled:opacity-60 transition-all duration-[var(--transition-fast)] shadow-sm hover:shadow-md active:scale-[0.98]"
             >
               {loading ? '로그인 중...' : '로그인'}
             </button>
           </form>
 
-          <p className="text-[11px] text-center text-gray-300 mt-4">
-            공통 비밀번호: <span className="font-mono text-gray-400">test1234</span>
+          <p className="text-[11px] text-center text-slate-300 mt-4">
+            공통 비밀번호: <span className="font-mono text-slate-400">test1234</span>
           </p>
         </div>
       </div>

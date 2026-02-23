@@ -105,11 +105,11 @@ export default function UserManagePage() {
     <div className="flex flex-wrap gap-3 items-end">
       {isPlatformAdmin && (
         <div className="flex flex-col gap-1">
-          <span className="text-xs text-gray-500 font-medium">프랜차이즈</span>
+          <span className="text-xs text-slate-500 font-medium">프랜차이즈</span>
           <select
             value={franchiseFilter}
             onChange={(e) => { setFranchiseFilter(e.target.value); setPage(0); }}
-            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+            className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
           >
             <option value="">전체</option>
             {FRANCHISE_OPTIONS.map((f) => (
@@ -119,11 +119,11 @@ export default function UserManagePage() {
         </div>
       )}
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">역할</span>
+        <span className="text-xs text-slate-500 font-medium">역할</span>
         <select
           value={roleFilter}
           onChange={(e) => { setRoleFilter(e.target.value); setPage(0); }}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         >
           <option value="">전체</option>
           {(isPlatformAdmin
@@ -135,13 +135,13 @@ export default function UserManagePage() {
         </select>
       </div>
       <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">이름/이메일 검색</span>
+        <span className="text-xs text-slate-500 font-medium">이름/이메일 검색</span>
         <input
           type="text"
           value={keyword}
           onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
           placeholder="검색..."
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
         />
       </div>
       <div className="ml-auto">
@@ -199,7 +199,7 @@ export default function UserManagePage() {
   return (
     <PageContainer>
       {/* 테이블 */}
-      <div className="bg-white rounded-xl border border-gray-200 p-5">
+      <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
         <Table<PlatformUser>
           columns={[
             { key: 'name', header: '이름' },
@@ -294,7 +294,7 @@ export default function UserManagePage() {
               type="email"
               {...registerInvite('email', { required: '필수 항목입니다.' })}
               placeholder="user@franchise.com"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             />
             {inviteErrors.email && (
               <span className="text-xs text-red-500">{inviteErrors.email.message}</span>
@@ -306,7 +306,7 @@ export default function UserManagePage() {
               type="text"
               {...registerInvite('name', { required: '필수 항목입니다.' })}
               placeholder="홍길동"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             />
             {inviteErrors.name && (
               <span className="text-xs text-red-500">{inviteErrors.name.message}</span>
@@ -316,7 +316,7 @@ export default function UserManagePage() {
             <label className="text-sm font-medium text-gray-700">역할 *</label>
             <select
               {...registerInvite('role', { required: true })}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             >
               {ROLE_OPTIONS.map((r) => (
                 <option key={r.value} value={r.value}>{r.label}</option>
@@ -328,7 +328,7 @@ export default function UserManagePage() {
               <label className="text-sm font-medium text-gray-700">매장 *</label>
               <select
                 {...registerInvite('storeId', { required: true })}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
               >
                 <option value="">매장 선택</option>
                 {STORE_OPTIONS.map((s) => (
@@ -342,7 +342,7 @@ export default function UserManagePage() {
               <label className="text-sm font-medium text-gray-700">지역 *</label>
               <select
                 {...registerInvite('regionId')}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
               >
                 <option value="REGION-01">강남 지역</option>
                 <option value="REGION-02">강북 지역</option>
@@ -367,7 +367,7 @@ export default function UserManagePage() {
             <label className="text-sm font-medium text-gray-700">역할</label>
             <select
               {...registerRole('role')}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
             >
               {ROLE_OPTIONS.map((r) => (
                 <option key={r.value} value={r.value}>{r.label}</option>
@@ -379,7 +379,7 @@ export default function UserManagePage() {
               <label className="text-sm font-medium text-gray-700">매장</label>
               <select
                 {...registerRole('storeId')}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
               >
                 <option value="">매장 선택</option>
                 {STORE_OPTIONS.map((s) => (

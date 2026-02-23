@@ -46,9 +46,9 @@ export default function ItemDetailPage() {
         </Button>
       </div>
       {/* 단품 정보 카드 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
+      <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
         <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 font-bold text-sm">
+          <div className="w-10 h-10 rounded-full bg-primary-100 flex items-center justify-center text-primary-700 font-bold text-sm">
             {item.category}
           </div>
           <div>
@@ -68,8 +68,8 @@ export default function ItemDetailPage() {
       </div>
 
       {/* 매장별 판매 현황 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <h2 className="text-sm font-semibold text-gray-700 mb-4">매장별 판매 현황</h2>
+      <div className="bg-white rounded-[var(--radius-card)] border border-slate-100 p-4 shadow-[var(--shadow-card)]">
+        <h2 className="text-sm font-semibold text-slate-700 mb-4">매장별 판매 현황</h2>
         <Table<StoreBreakdown>
           columns={[
             { key: 'storeName', header: '매장명' },

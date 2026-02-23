@@ -81,7 +81,7 @@ export default function TenantPermissionModal({ franchise, onClose }: TenantPerm
                     const val = e.target.value;
                     handleExceptionChange(menuId, val === 'inherit' ? null : val as MenuStatus);
                 }}
-                className="text-xs border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-1 focus:ring-blue-500 w-[120px]"
+                className="text-xs ring-1 ring-slate-200 rounded px-2 py-1 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 w-[120px]"
             >
                 <option value="inherit">기본/그룹 따름</option>
                 <option value="add">강제 허용</option>
@@ -121,7 +121,7 @@ export default function TenantPermissionModal({ franchise, onClose }: TenantPerm
                             checked={useDefault}
                             onChange={(e) => setUseDefault(e.target.checked)}
                         />
-                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+                        <div className="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary-600"></div>
                     </label>
                 </div>
 
@@ -132,13 +132,13 @@ export default function TenantPermissionModal({ franchise, onClose }: TenantPerm
                         {DUMMY_PERMISSION_GROUPS.map(group => (
                             <label
                                 key={group.id}
-                                className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${assignedGroups.includes(group.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'
+                                className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-all duration-[var(--transition-fast)] ${assignedGroups.includes(group.id) ? 'border-primary-500 bg-primary-50' : 'border-slate-200 hover:bg-slate-50'
                                     }`}
                             >
                                 <div className="pt-0.5">
                                     <input
                                         type="checkbox"
-                                        className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
+                                        className="w-4 h-4 text-primary-600 border-slate-300 rounded focus:ring-primary-500"
                                         checked={assignedGroups.includes(group.id)}
                                         onChange={() => handleGroupToggle(group.id)}
                                     />
