@@ -6,6 +6,8 @@ import {
   LayoutDashboard,
   Building2,
   Users,
+  Activity,
+  ShieldCheck,
 } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { canAccessMenu } from '@/utils/permissions';
@@ -33,6 +35,12 @@ const PLATFORM_MENU_ITEMS: MenuItem[] = [
     icon: <LayoutDashboard size={15} />,
   },
   {
+    path: '/platform/system-monitor',
+    label: '시스템 모니터링',
+    menuKey: 'platform-dashboard',
+    icon: <Activity size={15} />,
+  },
+  {
     path: '/platform/tenants',
     label: '테넌트 관리',
     menuKey: 'tenant-manage',
@@ -43,6 +51,12 @@ const PLATFORM_MENU_ITEMS: MenuItem[] = [
     label: '사용자 관리',
     menuKey: 'user-manage',
     icon: <Users size={15} />,
+  },
+  {
+    path: '/platform/permission-groups',
+    label: '권한 그룹 관리',
+    menuKey: 'permission-groups',
+    icon: <ShieldCheck size={15} />,
   },
 ];
 
@@ -66,9 +80,9 @@ export default function Sidebar() {
     return item;
   });
 
-  const visiblePlatformMenu = PLATFORM_MENU_ITEMS.filter(
-    (item) => !item.menuKey || canAccessMenu(currentUser, item.menuKey)
-  );
+  const visiblePlatformMenu = currentUser.role === 'PLATFORM_ADMIN'
+    ? PLATFORM_MENU_ITEMS.filter((item) => !item.menuKey || canAccessMenu(currentUser, item.menuKey))
+    : [];
 
   return (
     <aside className="w-48 bg-slate-900 text-white flex flex-col shrink-0">

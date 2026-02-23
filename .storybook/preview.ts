@@ -1,11 +1,12 @@
-import type { Preview } from 'storybook-react-rsbuild'
+import '../src/App.css';
+import type { Preview } from 'storybook-react-rsbuild';
 
 const preview: Preview = {
   parameters: {
     controls: {
       matchers: {
-       color: /(background|color)$/i,
-       date: /Date$/i,
+        color: /(background|color)$/i,
+        date: /Date$/i,
       },
     },
   },

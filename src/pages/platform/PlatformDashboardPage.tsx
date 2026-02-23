@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { TrendingUp, Users, Building2, Store, AlertTriangle } from 'lucide-react';
+import { TrendingUp, Users, Building2, Store } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import KpiCard from '@/components/ui/KpiCard';
 import DateRangePicker from '@/components/ui/DateRangePicker';
@@ -9,13 +9,12 @@ import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import FranchiseRankBarChart from '@/components/charts/FranchiseRankBarChart';
 import TrendLineChart from '@/components/charts/TrendLineChart';
-import { formatKRW, formatNumber, formatRatio } from '@/utils/formatters';
+import { formatKRW, formatNumber } from '@/utils/formatters';
 import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import { paginateArray } from '@/utils/dummy.helpers';
 import {
   DUMMY_PLATFORM_KPI,
   DUMMY_FRANCHISES,
-  DUMMY_ANOMALIES,
   DUMMY_TREND_PLATFORM,
   type FranchiseSummary,
 } from '@/data/platform.dummy';
@@ -52,79 +51,51 @@ export default function PlatformDashboardPage() {
   return (
     <PageContainer>
 
-      {/* 플랫폼 KPI */}
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        <KpiCard
-          label="플랫폼 총 매출"
-          value={formatKRW(DUMMY_PLATFORM_KPI.totalSales)}
-          compareRatio={DUMMY_PLATFORM_KPI.compareRatio}
-          icon={<TrendingUp size={15} />}
-        />
-        <KpiCard
-          label="총 객수"
-          value={formatNumber(DUMMY_PLATFORM_KPI.totalCustomerCount) + '명'}
-          compareRatio={2.1}
-          icon={<Users size={15} />}
-        />
-        <KpiCard
-          label="활성 프랜차이즈"
-          value={DUMMY_PLATFORM_KPI.activeFranchiseCount + '개'}
-          icon={<Building2 size={15} />}
-        />
-        <KpiCard
-          label="활성 매장"
-          value={DUMMY_PLATFORM_KPI.activeStoreCount + '개'}
-          icon={<Store size={15} />}
-        />
-      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+        {/* 좌측 세로 KPI 카드 (1열 차지) */}
+        <div className="lg:col-span-1 flex flex-col gap-3">
+          <KpiCard
+            label="플랫폼 총 매출"
+            value={formatKRW(DUMMY_PLATFORM_KPI.totalSales)}
+            compareRatio={DUMMY_PLATFORM_KPI.compareRatio}
+            icon={<TrendingUp size={15} />}
+          />
+          <KpiCard
+            label="총 객수"
+            value={formatNumber(DUMMY_PLATFORM_KPI.totalCustomerCount) + '명'}
+            compareRatio={2.1}
+            icon={<Users size={15} />}
+          />
+          <KpiCard
+            label="활성 프랜차이즈"
+            value={DUMMY_PLATFORM_KPI.activeFranchiseCount + '개'}
+            icon={<Building2 size={15} />}
+          />
+          <KpiCard
+            label="활성 매장"
+            value={DUMMY_PLATFORM_KPI.activeStoreCount + '개'}
+            icon={<Store size={15} />}
+          />
+        </div>
 
-      {/* 이상 징후 알림 */}
-      {DUMMY_ANOMALIES.length > 0 && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-5">
-          <div className="flex items-center gap-2 mb-3">
-            <AlertTriangle size={16} className="text-red-500 shrink-0" />
-            <h2 className="text-sm font-semibold text-red-700">
-              이상 징후 감지 — 전일 대비 매출 -30% 이상
-            </h2>
-          </div>
-          <div className="grid grid-cols-2 gap-3">
-            {DUMMY_ANOMALIES.map((a) => (
-              <div
-                key={a.storeId}
-                className="bg-white rounded-lg border border-red-200 p-4"
-              >
-                <div className="flex items-start justify-between">
-                  <div>
-                    <p className="font-medium text-gray-900">{a.storeName}</p>
-                    <p className="text-xs text-gray-500 mt-0.5">{a.franchiseName}</p>
-                  </div>
-                  <Badge color="red">{formatRatio(a.dropRatio)}</Badge>
-                </div>
-                <div className="flex gap-4 mt-2 text-xs text-gray-600">
-                  <span>오늘: <strong>{formatKRW(a.todaySales)}</strong></span>
-                  <span>어제: {formatKRW(a.yesterdaySales)}</span>
-                </div>
-              </div>
-            ))}
+        {/* 우측 메인 차트 (3열 차지) */}
+        <div className="lg:col-span-3 bg-white rounded-lg border border-gray-100 p-4 shadow-sm flex flex-col">
+          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
+            플랫폼 전체 매출 추이
+          </h2>
+          <div className="flex-1 min-h-[300px]">
+            <TrendLineChart data={platformTrend} />
           </div>
         </div>
-      )}
+      </div>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         {/* 프랜차이즈 랭킹 차트 */}
         <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
           <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
             프랜차이즈별 매출 랭킹
           </h2>
           <FranchiseRankBarChart franchises={DUMMY_FRANCHISES} />
-        </div>
-
-        {/* 플랫폼 전체 트렌드 */}
-        <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-          <h2 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3">
-            플랫폼 전체 매출 추이
-          </h2>
-          <TrendLineChart data={platformTrend} />
         </div>
       </div>
 

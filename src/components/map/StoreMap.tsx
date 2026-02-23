@@ -1,5 +1,5 @@
-import { useState, useMemo } from 'react';
-import Map, { Marker, Popup, NavigationControl } from 'react-map-gl/maplibre';
+import { useState, useMemo, useRef, useEffect } from 'react';
+import Map, { Marker, Popup, NavigationControl, type MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 import { Pill, MapPin, Phone } from 'lucide-react';
 import type { Store } from '@/data/platform.dummy';
@@ -48,12 +48,13 @@ export default function StoreMap({ stores, selectedStoreId, onStoreClick, showLe
                 'osm-tiles': {
                     type: 'raster' as const,
                     tiles: [
-                        'https://mt1.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=ko',
-                        'https://mt2.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=ko',
-                        'https://mt3.google.com/vt/lyrs=m&x={x}&y={y}&z={z}&hl=ko',
+                        'https://a.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+                        'https://b.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+                        'https://c.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
+                        'https://d.basemaps.cartocdn.com/light_nolabels/{z}/{x}/{y}.png',
                     ],
                     tileSize: 256,
-                    attribution: '&copy; <a href="https://maps.google.com">Google Maps</a>',
+                    attribution: '&copy; <a href="https://carto.com/attributions">CARTO</a>',
                 },
             },
             layers: [
@@ -70,20 +71,72 @@ export default function StoreMap({ stores, selectedStoreId, onStoreClick, showLe
     );
 
     // 중심으로 할 뷰포트 계산 (초기 렌더링 시 대한민국 전역 표출 혹은 서울 중심)
-    // 전국 지도 뷰를 위해 zoom 레벨과 중심점을 조정 (stores 의 분포에 따라 동적으로 할 수도 있으나 여기선 고정값 사용)
+    // 초깃값은 전국뷰지만 useEffect 내에서 stores 분포에 따라 fitBounds 처리함
     const initialViewState = {
         longitude: showLegend ? 127.8 : 127.035, // 전국 뷰일 때는 조금 더 동쪽 중심
         latitude: showLegend ? 36.3 : 37.505,   // 전국 뷰일 때는 남쪽으로
         zoom: showLegend ? 6.5 : 12,
     };
 
+    const mapRef = useRef<MapRef>(null);
+    const [mapLoaded, setMapLoaded] = useState(false);
+    const fitTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    // stores 변경 시 400ms 디바운스 후 fitBounds 실행 — 빠른 필터 전환 시 중간 애니메이션 생략
+    useEffect(() => {
+        if (!mapRef.current || stores.length === 0 || !mapLoaded) return;
+
+        if (fitTimerRef.current !== null) clearTimeout(fitTimerRef.current);
+
+        fitTimerRef.current = setTimeout(() => {
+            if (!mapRef.current) return;
+
+            let minLng = 180, maxLng = -180, minLat = 90, maxLat = -90;
+            stores.forEach((store) => {
+                if (store.longitude < minLng) minLng = store.longitude;
+                if (store.longitude > maxLng) maxLng = store.longitude;
+                if (store.latitude < minLat) minLat = store.latitude;
+                if (store.latitude > maxLat) maxLat = store.latitude;
+            });
+
+            mapRef.current.fitBounds(
+                [
+                    [Math.max(121.0, minLng), Math.max(30.5, minLat)],
+                    [Math.min(134.0, maxLng), Math.min(43.0, maxLat)],
+                ],
+                {
+                    padding: 80,
+                    duration: 1800,
+                    maxZoom: 13,
+                    easing: (t: number) => t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t,
+                }
+            );
+            fitTimerRef.current = null;
+        }, 400);
+
+        return () => {
+            if (fitTimerRef.current !== null) {
+                clearTimeout(fitTimerRef.current);
+                fitTimerRef.current = null;
+            }
+        };
+    }, [stores, mapLoaded]);
+
     return (
-        <div className="w-full h-full relative rounded-xl overflow-hidden border border-gray-200">
+        <div className="w-full h-full relative rounded-xl overflow-hidden border border-gray-200 bg-[#f8f9fa]">
             <Map
+                ref={mapRef}
+                onLoad={() => setMapLoaded(true)}
                 initialViewState={initialViewState}
                 mapStyle={mapStyle}
                 style={{ width: '100%', height: '100%' }}
                 interactiveLayerIds={['osm-tiles-layer']}
+                attributionControl={false}
+                maxBounds={[
+                    [121.0, 30.5], // 서해 및 남해 여유 확보
+                    [134.0, 43.0], // 동해 및 북쪽 여유 확보
+                ]}
+                minZoom={5.5}
             >
                 <NavigationControl position="bottom-right" />
 

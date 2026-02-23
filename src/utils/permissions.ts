@@ -20,6 +20,7 @@ export function canAccessMenu(user: AuthUser, menuKey: string): boolean {
     'platform-dashboard': ['PLATFORM_DASHBOARD'],
     'platform-tenants': ['TENANT_MANAGE'],
     'platform-users': ['USER_MANAGE'],
+    'permission-groups': ['TENANT_MANAGE'],
     'franchise-stores': ['FRANCHISE_STORE_MANAGE'],
   };
   const required = menuPermissions[menuKey];

@@ -329,4 +329,41 @@ export const DUMMY_STORES: Store[] = [
   { storeId: 'STR-024', storeName: '세종아름점', franchiseId: 'FRAN-003', franchiseName: '□□메디팜', address: '세종특별자치시 아름동 달빛로 43', latitude: 36.5134, longitude: 127.2465, contact: '044-345-6794', status: 'ACTIVE' },
   { storeId: 'STR-025', storeName: '청주지웰점', franchiseId: 'FRAN-003', franchiseName: '□□메디팜', address: '충북 청주시 흥덕구 대농로 47', latitude: 36.6387, longitude: 127.4320, contact: '043-345-6795', status: 'ACTIVE' },
   { storeId: 'STR-026', storeName: '천안불당점', franchiseId: 'FRAN-003', franchiseName: '□□메디팜', address: '충남 천안시 서북구 불당대로 123', latitude: 36.8166, longitude: 127.1143, contact: '041-345-6796', status: 'ACTIVE' },
+
+  // FRAN-004 ~ FRAN-012 전국구 더미 데이터 자동 생성
+  ...Array.from({ length: 45 }, (_, i) => {
+    const franchiseIdx = (i % 9) + 4; // 4 to 12
+    const franchiseId = `FRAN-${String(franchiseIdx).padStart(3, '0')}`;
+    const franchiseNames = ['가나약국체인', '☆☆웰니스', '다라약국체인', '마바약국체인', '사아약국체인', '자차약국체인', '카타약국체인', '파하약국체인', '하늘약국체인'];
+    // 전국 주요 10개 도시 대략적 위경도 범위 내 랜덤 생성
+    const regions = [
+      { name: '서울', lat: 37.5665, lng: 126.9780 },
+      { name: '부산', lat: 35.1796, lng: 129.0756 },
+      { name: '대구', lat: 35.8714, lng: 128.6014 },
+      { name: '인천', lat: 37.4563, lng: 126.7052 },
+      { name: '광주', lat: 35.1595, lng: 126.8526 },
+      { name: '대전', lat: 36.3504, lng: 127.3845 },
+      { name: '울산', lat: 35.5384, lng: 129.3114 },
+      { name: '세종', lat: 36.4800, lng: 127.2890 },
+      { name: '제주', lat: 33.4996, lng: 126.5312 },
+      { name: '강원', lat: 37.8813, lng: 127.7298 },
+    ];
+    const region = regions[i % regions.length];
+
+    // 중심점에서 반경 약 1~10km 내 랜덤 오프셋
+    const latOffset = (Math.random() - 0.5) * 0.1;
+    const lngOffset = (Math.random() - 0.5) * 0.1;
+
+    return {
+      storeId: `STR-GEN-${String(i + 27).padStart(3, '0')}`,
+      storeName: `${region.name} ${i + 1}호점`,
+      franchiseId,
+      franchiseName: franchiseNames[franchiseIdx - 4],
+      address: `${region.name} 주요 거점 ${i + 1}로 123`,
+      latitude: region.lat + latOffset,
+      longitude: region.lng + lngOffset,
+      contact: `050-1234-${String(1000 + i)}`,
+      status: (Math.random() > 0.8 ? 'CLOSED' : 'ACTIVE') as 'ACTIVE' | 'CLOSED',
+    };
+  })
 ];

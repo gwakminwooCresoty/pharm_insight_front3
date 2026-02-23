@@ -129,9 +129,11 @@ export default function PosStatisticsPage() {
             ))}
           </select>
         </div>
-        <Button onClick={() => setShowCompare(!showCompare)} variant="secondary">
-          {showCompare ? '비교기간 닫기' : '기간 비교'}
-        </Button>
+        {activeTab === 'date' && (
+          <Button onClick={() => setShowCompare(!showCompare)} variant="secondary">
+            {showCompare ? '비교기간 닫기' : '기간 비교'}
+          </Button>
+        )}
         <Button onClick={() => setPage(0)}>조회</Button>
         {can('EXPORT_DATA') && (
           <div>
@@ -141,17 +143,23 @@ export default function PosStatisticsPage() {
           </div>
         )}
       </div>
-      {showCompare && (
-        <div className="mt-3 pt-3 border-t border-gray-100">
-          <DateRangePicker
-            startDate={compareStart}
-            endDate={compareEnd}
-            onStartChange={setCompareStart}
-            onEndChange={setCompareEnd}
-            label="비교 기간"
-          />
+      <div
+        className={`grid transition-[grid-template-rows] duration-300 ease-in-out ${
+          showCompare && activeTab === 'date' ? 'grid-rows-[1fr]' : 'grid-rows-[0fr]'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="mt-3 pt-3 border-t border-gray-100">
+            <DateRangePicker
+              startDate={compareStart}
+              endDate={compareEnd}
+              onStartChange={setCompareStart}
+              onEndChange={setCompareEnd}
+              label="비교 기간"
+            />
+          </div>
         </div>
-      )}
+      </div>
     </>,
   );
 
@@ -273,19 +281,19 @@ export default function PosStatisticsPage() {
           <KpiCard
             label="매출액"
             value={formatKRW(DUMMY_POS_SUMMARY.totalSales)}
-            compareRatio={showCompare ? DUMMY_POS_SUMMARY.compareRatio : undefined}
+            compareRatio={showCompare && activeTab === 'date' ? DUMMY_POS_SUMMARY.compareRatio : undefined}
             icon={<TrendingUp size={15} />}
           />
           <KpiCard
             label="객수"
             value={formatNumber(DUMMY_POS_SUMMARY.customerCount) + '명'}
-            compareRatio={showCompare ? 3.1 : undefined}
+            compareRatio={showCompare && activeTab === 'date' ? 3.1 : undefined}
             icon={<Users size={15} />}
           />
           <KpiCard
             label="객단가"
             value={formatKRW(DUMMY_POS_SUMMARY.avgSpend)}
-            compareRatio={showCompare ? 2.0 : undefined}
+            compareRatio={showCompare && activeTab === 'date' ? 2.0 : undefined}
             icon={<ShoppingBag size={15} />}
           />
         </div>

@@ -3,22 +3,7 @@ import Modal from '@/components/ui/Modal';
 import Button from '@/components/ui/Button';
 import Badge from '@/components/ui/Badge';
 import type { FranchiseSummary } from '@/data/platform.dummy';
-
-export const PERMISSION_MENUS = [
-    { id: 'm_dashboard', label: '대시보드', isDefault: true, parentId: null },
-    { id: 'm_store', label: '매장 관리', isDefault: true, parentId: null },
-    { id: 'm_statistics', label: '통계/분석', isDefault: false, parentId: null },
-    { id: 'm_stat_premium', label: '프리미엄 통계', isDefault: false, parentId: 'm_statistics' },
-    { id: 'm_settlement', label: '정산 관리', isDefault: false, parentId: null },
-    { id: 'm_tax', label: '세금계산서', isDefault: false, parentId: 'm_settlement' },
-    { id: 'm_api', label: 'API 연동', isDefault: false, parentId: null },
-];
-
-export const PERMISSION_GROUPS = [
-    { id: 'g_premium', name: '프리미엄 분석 그룹', menuIds: ['m_statistics', 'm_stat_premium'] },
-    { id: 'g_settlement', name: '정산 전용 그룹', menuIds: ['m_settlement', 'm_tax'] },
-    { id: 'g_api', name: '외부 연동 그룹', menuIds: ['m_api'] },
-];
+import { PERMISSION_MENUS, DUMMY_PERMISSION_GROUPS } from '@/data/permission.dummy';
 
 interface TenantPermissionModalProps {
     tenant: FranchiseSummary | null;
@@ -51,7 +36,7 @@ export default function TenantPermissionModal({ tenant, onClose }: TenantPermiss
         }
 
         // 2. 그룹 권한 추가
-        PERMISSION_GROUPS.forEach(g => {
+        DUMMY_PERMISSION_GROUPS.forEach(g => {
             if (assignedGroups.includes(g.id)) {
                 g.menuIds.forEach(id => ids.add(id));
             }
@@ -144,7 +129,7 @@ export default function TenantPermissionModal({ tenant, onClose }: TenantPermiss
                 <div>
                     <h4 className="font-semibold text-gray-800 mb-3">권한 그룹(역할별) 부여</h4>
                     <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-                        {PERMISSION_GROUPS.map(group => (
+                        {DUMMY_PERMISSION_GROUPS.map(group => (
                             <label
                                 key={group.id}
                                 className={`flex items-start gap-3 p-3 border rounded-lg cursor-pointer transition-colors ${assignedGroups.includes(group.id) ? 'border-blue-500 bg-blue-50' : 'border-gray-200 hover:bg-gray-50'

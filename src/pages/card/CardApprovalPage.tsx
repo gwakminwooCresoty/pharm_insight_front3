@@ -87,23 +87,29 @@ export default function CardApprovalPage() {
   }
 
   useSetPageFooter(
-    <div className="flex items-center gap-6">
-      <div className="flex items-center gap-2">
-        <Hash size={13} className="text-gray-400" />
-        <span className="text-xs text-gray-500">총 건수</span>
-        <span className="text-sm font-semibold text-gray-900">{formatNumber(filtered.length)}건</span>
+    <div className="flex items-center gap-8">
+      <div className="flex items-center gap-2.5">
+        <Hash size={16} className="text-gray-400 shrink-0" />
+        <div>
+          <div className="text-[11px] text-gray-400 font-medium leading-none mb-1">총 건수</div>
+          <div className="text-base font-bold text-gray-900 leading-none">{formatNumber(filtered.length)}건</div>
+        </div>
       </div>
-      <div className="w-px h-4 bg-gray-200" />
-      <div className="flex items-center gap-2">
-        <CheckCircle2 size={13} className="text-emerald-500" />
-        <span className="text-xs text-gray-500">총 승인금액</span>
-        <span className="text-sm font-semibold text-gray-900">{formatKRW(totalApproved)}</span>
+      <div className="w-px h-8 bg-gray-200" />
+      <div className="flex items-center gap-2.5">
+        <CheckCircle2 size={16} className="text-emerald-500 shrink-0" />
+        <div>
+          <div className="text-[11px] text-gray-400 font-medium leading-none mb-1">총 승인금액</div>
+          <div className="text-base font-bold text-gray-900 leading-none">{formatKRW(totalApproved)}</div>
+        </div>
       </div>
-      <div className="w-px h-4 bg-gray-200" />
-      <div className="flex items-center gap-2">
-        <XCircle size={13} className="text-red-400" />
-        <span className="text-xs text-gray-500">총 취소금액</span>
-        <span className="text-sm font-semibold text-red-500">{formatKRW(totalCancelled)}</span>
+      <div className="w-px h-8 bg-gray-200" />
+      <div className="flex items-center gap-2.5">
+        <XCircle size={16} className="text-red-400 shrink-0" />
+        <div>
+          <div className="text-[11px] text-gray-400 font-medium leading-none mb-1">총 취소금액</div>
+          <div className="text-base font-bold text-red-500 leading-none">{formatKRW(totalCancelled)}</div>
+        </div>
       </div>
     </div>,
   );

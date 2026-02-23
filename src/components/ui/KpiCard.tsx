@@ -17,7 +17,7 @@ export default function KpiCard({
   const isNegative = compareRatio !== undefined && compareRatio < 0;
 
   return (
-    <div className="bg-white rounded-lg border border-gray-100 px-4 py-3 shadow-sm">
+    <div className="bg-white rounded-lg border border-gray-100 px-4 py-3 shadow-sm flex flex-col justify-center">
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-[11px] text-gray-400 font-semibold uppercase tracking-wide">
           {label}
@@ -27,7 +27,7 @@ export default function KpiCard({
         )}
       </div>
       <div className="flex items-baseline gap-2">
-        <span className="text-[22px] font-bold text-gray-900 leading-none">{value}</span>
+        <span className="text-[22px] font-bold text-gray-900 leading-none whitespace-nowrap">{value}</span>
         {compareRatio !== undefined && (
           <span
             className={`text-[11px] font-semibold ${

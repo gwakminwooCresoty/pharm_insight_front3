@@ -25,9 +25,10 @@
 | 상태관리 | **Zustand** 5 + `persist` | localStorage 키: `pharminsight-auth` |
 | 라우팅 | **react-router-dom** 7 | `createBrowserRouter` + `RouterProvider` |
 | 차트 | **recharts** 3 | `ResponsiveContainer` 필수 래퍼 |
-| 폼 | **react-hook-form** 7 | TenantManagePage, UserManagePage에서 사용 |
+| 폼 | **react-hook-form** 7 | TenantManagePage, UserManagePage, PermissionGroupPage에서 사용 |
 | 아이콘 | **lucide-react** 0.575 | 이모지 일절 미사용, SVG 아이콘만 사용 |
 | 패키지 매니저 | **Bun** | `bun add`, `bun run build` |
+| Storybook | **Storybook** 10 + `storybook-react-rsbuild` | `bun run storybook` (포트 6006) |
 
 ### 경로 별칭
 
@@ -111,7 +112,8 @@ src/
 │   ├── pos.dummy.ts           # POS 실적, 트렌드, 단품 100개
 │   ├── settlement.dummy.ts    # 정산서 결제수단별 데이터
 │   ├── card.dummy.ts          # 카드사별 요약, 승인내역 200건
-│   └── platform.dummy.ts      # 플랫폼 KPI, 프랜차이즈 12개, 사용자 26명
+│   ├── platform.dummy.ts      # 플랫폼 KPI, 프랜차이즈 12개, 사용자 26명
+│   └── permission.dummy.ts    # PERMISSION_MENUS (7개 메뉴), DUMMY_PERMISSION_GROUPS (4개 그룹)
 │
 ├── components/
 │   ├── layout/
@@ -150,9 +152,11 @@ src/
     ├── card/
     │   └── CardApprovalPage.tsx   # 카드승인 조회
     └── platform/
-        ├── PlatformDashboardPage.tsx # 플랫폼 전체 현황
-        ├── TenantManagePage.tsx      # 테넌트(프랜차이즈) CRUD
-        └── UserManagePage.tsx        # 사용자 관리 (초대, 역할 수정, 상태 토글)
+        ├── PlatformDashboardPage.tsx  # 플랫폼 전체 현황
+        ├── TenantManagePage.tsx       # 테넌트(프랜차이즈) CRUD
+        ├── TenantPermissionModal.tsx  # 테넌트별 권한 그룹 배정 + 메뉴 예외 설정 모달
+        ├── UserManagePage.tsx         # 사용자 관리 (초대, 역할 수정, 상태 토글)
+        └── PermissionGroupPage.tsx    # 권한 그룹 CRUD (그룹명·설명·포함메뉴 관리)
 ```
 
 ---
@@ -169,8 +173,9 @@ src/
   /settlement            → RoleGuard(SETTLEMENT_READ) → SettlementPage
   /card/approvals        → RoleGuard(CARD_APPROVAL_READ) → CardApprovalPage
   /platform/dashboard    → RoleGuard(PLATFORM_DASHBOARD) → PlatformDashboardPage
-  /platform/tenants      → RoleGuard(TENANT_MANAGE) → TenantManagePage
-  /platform/users        → RoleGuard(USER_MANAGE) → UserManagePage
+  /platform/tenants           → RoleGuard(TENANT_MANAGE) → TenantManagePage
+  /platform/users             → RoleGuard(USER_MANAGE) → UserManagePage
+  /platform/permission-groups → RoleGuard(TENANT_MANAGE) → PermissionGroupPage
 ```
 
 - **PrivateRoute**: 미인증 시 `/platform/*` 경로는 `/platform/login`으로, 나머지는 `/login`으로 redirect
@@ -480,6 +485,14 @@ text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3
 - `DUMMY_ANOMALIES` > 0 → 이상징후 알림 박스 표시
 - `paginateArray(DUMMY_FRANCHISES, page, 10)` → 프랜차이즈 테이블
 
+### PermissionGroupPage (`/platform/permission-groups`)
+- `DUMMY_PERMISSION_GROUPS` 로컬 state로 관리 (API 연동 전까지)
+- 상단 KPI 3개: 전체 그룹 수 / 시스템 그룹 수 / 커스텀 그룹 수
+- 그룹 등록/수정 모달: react-hook-form (name, description) + `MenuCheckboxGroup` (계층형 체크박스)
+- 시스템 그룹(`isSystem: true`)은 삭제 불가 (버튼 disabled)
+- 삭제 확인 모달: 포함 메뉴 목록을 amber 경고박스로 표시
+- `permission.dummy.ts`의 `PERMISSION_MENUS` / `DUMMY_PERMISSION_GROUPS` 공유 → `TenantPermissionModal`도 동일 소스 사용
+
 ### TenantManagePage (`/platform/tenants`)
 - react-hook-form으로 생성/수정 모달 구현
 - 상태 변경(ACTIVE ↔ SUSPENDED) 확인 모달
@@ -494,20 +507,12 @@ text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3
 ## 11. 빌드 / 개발 명령어
 
 ```bash
-bun run dev      # 개발 서버 (--open으로 브라우저 자동 열림)
-bun run build    # 프로덕션 빌드 → dist/
-bun run preview  # 빌드 결과 미리보기
-bun run check    # Biome lint + format
-```
-
-**현재 빌드 결과** (경고 0건):
-```
-dist/static/css/index.css     34.4 kB
-dist/static/js/index.js       80.9 kB   (앱 코드)
-dist/static/js/lib-router.js  85.0 kB   (react-router)
-dist/static/js/lib-react.js   189.7 kB  (react)
-dist/static/js/[chunk].js     424.8 kB  (recharts 등)
-Total: ~821 kB
+bun run dev              # 개발 서버 (--open으로 브라우저 자동 열림)
+bun run build            # 프로덕션 빌드 → dist/
+bun run preview          # 빌드 결과 미리보기
+bun run check            # Biome lint + format
+bun run storybook        # Storybook 개발 서버 (포트 6006)
+bun run build-storybook  # Storybook 정적 빌드 → storybook-static/
 ```
 
 ---
@@ -517,13 +522,14 @@ Total: ~821 kB
 현재 더미 데이터는 `src/data/*.dummy.ts`에 집중되어 있어, API 연동 시 해당 파일만 교체하면 됩니다.
 
 ```
-src/data/branding.dummy.ts  → GET /api/platform/branding
-src/data/pos.dummy.ts       → GET /api/pos/statistics, /api/pos/items
-src/data/settlement.dummy.ts→ GET /api/settlement
-src/data/card.dummy.ts      → GET /api/card/approvals
-src/data/platform.dummy.ts  → GET /api/platform/dashboard, /api/franchises, /api/users
-src/data/auth.dummy.ts      → POST /api/auth/login (JWT 반환)
-                               POST /api/platform/auth/login (플랫폼 관리자 전용)
+src/data/branding.dummy.ts    → GET /api/platform/branding
+src/data/pos.dummy.ts         → GET /api/pos/statistics, /api/pos/items
+src/data/settlement.dummy.ts  → GET /api/settlement
+src/data/card.dummy.ts        → GET /api/card/approvals
+src/data/platform.dummy.ts    → GET /api/platform/dashboard, /api/franchises, /api/users
+src/data/permission.dummy.ts  → GET /api/permission/menus, /api/permission/groups (CRUD)
+src/data/auth.dummy.ts        → POST /api/auth/login (JWT 반환)
+                                 POST /api/platform/auth/login (플랫폼 관리자 전용)
 ```
 
 `paginateArray()` 함수는 Spring Page 응답 형식과 동일한 구조를 반환하도록 설계되어 있어, API 교체 후에도 `PageResult<T>` 타입과 `Pagination` 컴포넌트는 그대로 사용 가능합니다.
@@ -594,3 +600,22 @@ src/data/auth.dummy.ts      → POST /api/auth/login (JWT 반환)
     // 잘못됨 — viewBox.cx/cy fallback 0 → 좌상단 렌더링
     <Label content={(props) => <text x={props.viewBox?.cx ?? 0} .../>} />
     ```
+
+14. **Storybook 스토리 작성 규칙**:
+    - 스토리 파일은 컴포넌트와 동일한 디렉토리에 co-locate: `Button.tsx` → `Button.stories.tsx`
+    - `tags: ['autodocs']`는 meta 레벨에만 1회 선언 (스토리별 X)
+    - `fn()` import: `import { fn } from 'storybook/test'` (storybook 10.x 기준)
+    - 차트 컴포넌트는 `ResponsiveContainer`가 부모 너비에 의존하므로 decorator로 고정 너비 래핑:
+      ```tsx
+      decorators: [
+        (Story) => <div style={{ width: 720 }}><Story /></div>,
+      ],
+      ```
+    - 상태가 필요한 컴포넌트(Modal, Pagination, MultiSelect, DateRangePicker)는 `render` 함수 내부에 `React.useState` 사용
+    - `.storybook/main.ts`의 `rsbuildFinal` 훅으로 `@/` 별칭 주입 (없으면 `@/` import 전부 오류)
+    - **⚠️ `__dirname` ESM 오류**: storybook config는 ESM으로 실행되므로 `__dirname` 사용 시 `ReferenceError`. 반드시 `fileURLToPath` 사용:
+      ```ts
+      import { fileURLToPath } from 'node:url';
+      const __dirname = path.dirname(fileURLToPath(import.meta.url));
+      ```
+    - `.storybook/preview.ts`에서 `import '../src/App.css'`로 Tailwind CSS 4 활성화 (없으면 스타일 전혀 적용 안 됨)
