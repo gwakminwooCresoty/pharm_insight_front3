@@ -1,26 +1,14 @@
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ROLE_LABELS } from '@/utils/permissions';
-
-const PAGE_TITLES: Record<string, string> = {
-  '/pos/statistics': 'POS 실적 조회',
-  '/settlement': 'CR정산서',
-  '/card/approvals': '카드승인 조회',
-  '/platform/dashboard': '플랫폼 대시보드',
-  '/platform/tenants': '테넌트 관리',
-  '/platform/users': '사용자 관리',
-};
+import { usePageMeta } from '@/hooks/usePageMeta';
 
 export default function TopHeader() {
   const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
-  const location = useLocation();
+  const { title, subtitle } = usePageMeta();
 
   if (!currentUser) return null;
-
-  const pageTitle =
-    PAGE_TITLES[location.pathname] ??
-    (location.pathname.startsWith('/pos/items/') ? '단품 실적 상세' : '');
 
   function handleLogout() {
     logout();
@@ -28,10 +16,13 @@ export default function TopHeader() {
   }
 
   return (
-    <header className="h-12 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0 shadow-sm">
-      <div className="flex items-center gap-2">
-        {pageTitle && (
-          <span className="text-sm font-semibold text-gray-700">{pageTitle}</span>
+    <header className="h-14 bg-white border-b border-gray-100 flex items-center justify-between px-6 shrink-0 shadow-sm">
+      <div className="flex flex-col justify-center">
+        {title && (
+          <span className="text-sm font-semibold text-gray-800 leading-tight">{title}</span>
+        )}
+        {subtitle && (
+          <span className="text-xs text-gray-400 leading-tight mt-0.5">{subtitle}</span>
         )}
       </div>
       <div className="flex items-center gap-3">

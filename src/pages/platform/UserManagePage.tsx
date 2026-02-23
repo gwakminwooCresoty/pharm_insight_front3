@@ -7,6 +7,7 @@ import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import Modal from '@/components/ui/Modal';
 import { useAuth } from '@/hooks/useAuth';
+import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import { ROLE_LABELS } from '@/utils/permissions';
 import { paginateArray } from '@/utils/dummy.helpers';
 import {
@@ -55,6 +56,10 @@ function statusBadge(status: UserStatus) {
 export default function UserManagePage() {
   const { currentUser } = useAuth();
   const isPlatformAdmin = currentUser?.role === 'PLATFORM_ADMIN';
+  useSetPageMeta(
+    '사용자 및 권한 관리',
+    isPlatformAdmin ? '전체 플랫폼 사용자 관리' : `${currentUser?.franchiseName ?? ''} 소속 사용자 관리`,
+  );
 
   const [users, setUsers] = useState<PlatformUser[]>(DUMMY_PLATFORM_USERS);
   const [keyword, setKeyword] = useState('');
@@ -95,6 +100,57 @@ export default function UserManagePage() {
   });
 
   const paged = paginateArray(filtered, page, PAGE_SIZE);
+
+  useSetPageFilters(
+    <div className="flex flex-wrap gap-3 items-end">
+      {isPlatformAdmin && (
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500 font-medium">프랜차이즈</span>
+          <select
+            value={franchiseFilter}
+            onChange={(e) => { setFranchiseFilter(e.target.value); setPage(0); }}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            <option value="">전체</option>
+            {FRANCHISE_OPTIONS.map((f) => (
+              <option key={f.value} value={f.value}>{f.label}</option>
+            ))}
+          </select>
+        </div>
+      )}
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">역할</span>
+        <select
+          value={roleFilter}
+          onChange={(e) => { setRoleFilter(e.target.value); setPage(0); }}
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">전체</option>
+          {(isPlatformAdmin
+            ? [{ value: 'PLATFORM_ADMIN', label: '플랫폼 관리자' }, ...ROLE_OPTIONS]
+            : ROLE_OPTIONS
+          ).map((r) => (
+            <option key={r.value} value={r.value}>{r.label}</option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">이름/이메일 검색</span>
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
+          placeholder="검색..."
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div className="ml-auto">
+        <Button onClick={() => { resetInvite(); setInviteOpen(true); }}>
+          + 사용자 초대
+        </Button>
+      </div>
+    </div>,
+  );
 
   function handleInvite(data: InviteFormData) {
     const franchiseId = currentUser?.franchiseId ?? (franchiseFilter || 'FRAN-001');
@@ -141,62 +197,7 @@ export default function UserManagePage() {
   }
 
   return (
-    <PageContainer
-      title="사용자 및 권한 관리"
-      subtitle={isPlatformAdmin ? '전체 플랫폼 사용자 관리' : `${currentUser?.franchiseName} 소속 사용자 관리`}
-      actions={
-        <Button onClick={() => { resetInvite(); setInviteOpen(true); }}>
-          + 사용자 초대
-        </Button>
-      }
-    >
-      {/* 검색 필터 */}
-      <div className="bg-white rounded-xl border border-gray-200 p-4">
-        <div className="flex flex-wrap gap-3 items-end">
-          {isPlatformAdmin && (
-            <div className="flex flex-col gap-1">
-              <span className="text-xs text-gray-500 font-medium">프랜차이즈</span>
-              <select
-                value={franchiseFilter}
-                onChange={(e) => { setFranchiseFilter(e.target.value); setPage(0); }}
-                className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="">전체</option>
-                {FRANCHISE_OPTIONS.map((f) => (
-                  <option key={f.value} value={f.value}>{f.label}</option>
-                ))}
-              </select>
-            </div>
-          )}
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">역할</span>
-            <select
-              value={roleFilter}
-              onChange={(e) => { setRoleFilter(e.target.value); setPage(0); }}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">전체</option>
-              {(isPlatformAdmin
-                ? [{ value: 'PLATFORM_ADMIN', label: '플랫폼 관리자' }, ...ROLE_OPTIONS]
-                : ROLE_OPTIONS
-              ).map((r) => (
-                <option key={r.value} value={r.value}>{r.label}</option>
-              ))}
-            </select>
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">이름/이메일 검색</span>
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
-              placeholder="검색..."
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-        </div>
-      </div>
-
+    <PageContainer>
       {/* 테이블 */}
       <div className="bg-white rounded-xl border border-gray-200 p-5">
         <Table<PlatformUser>

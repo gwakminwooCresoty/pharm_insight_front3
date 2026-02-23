@@ -7,6 +7,7 @@ import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import Modal from '@/components/ui/Modal';
 import { paginateArray } from '@/utils/dummy.helpers';
+import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import {
   DUMMY_FRANCHISES,
   type FranchiseSummary,
@@ -35,6 +36,7 @@ function statusBadge(status: FranchiseStatus) {
 }
 
 export default function TenantManagePage() {
+  useSetPageMeta('테넌트 관리', '프랜차이즈 등록 및 계약 정보 관리');
   const [franchises, setFranchises] = useState<FranchiseSummary[]>(DUMMY_FRANCHISES);
   const [keyword, setKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -58,6 +60,39 @@ export default function TenantManagePage() {
     return true;
   });
   const paged = paginateArray(filtered, page, PAGE_SIZE);
+
+  useSetPageFilters(
+    <div className="flex gap-3 items-end">
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">프랜차이즈명</span>
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
+          placeholder="이름 검색"
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">상태</span>
+        <select
+          value={statusFilter}
+          onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">전체</option>
+          <option value="ACTIVE">활성</option>
+          <option value="INACTIVE">비활성</option>
+          <option value="SUSPENDED">정지</option>
+        </select>
+      </div>
+      <div className="ml-auto">
+        <Button onClick={() => { reset(); setCreateOpen(true); }}>
+          + 프랜차이즈 등록
+        </Button>
+      </div>
+    </div>,
+  );
 
   function handleCreate(data: FormData) {
     const newFranchise: FranchiseSummary = {
@@ -122,44 +157,7 @@ export default function TenantManagePage() {
   }
 
   return (
-    <PageContainer
-      title="테넌트 관리"
-      subtitle="프랜차이즈 등록 및 계약 정보 관리"
-      actions={
-        <Button onClick={() => { reset(); setCreateOpen(true); }}>
-          + 프랜차이즈 등록
-        </Button>
-      }
-    >
-      {/* 검색 필터 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <div className="flex gap-3 items-end">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">프랜차이즈명</span>
-            <input
-              type="text"
-              value={keyword}
-              onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
-              placeholder="이름 검색"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">상태</span>
-            <select
-              value={statusFilter}
-              onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">전체</option>
-              <option value="ACTIVE">활성</option>
-              <option value="INACTIVE">비활성</option>
-              <option value="SUSPENDED">정지</option>
-            </select>
-          </div>
-        </div>
-      </div>
-
+    <PageContainer>
       {/* 테이블 */}
       <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
         <Table<FranchiseSummary>

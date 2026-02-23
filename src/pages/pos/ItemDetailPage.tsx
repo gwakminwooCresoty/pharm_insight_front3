@@ -1,4 +1,5 @@
 import { useParams, useNavigate } from 'react-router-dom';
+import { useSetPageMeta } from '@/hooks/usePageMeta';
 import { Package, TrendingUp, Tag } from 'lucide-react';
 import PageContainer from '@/components/layout/PageContainer';
 import KpiCard from '@/components/ui/KpiCard';
@@ -20,6 +21,7 @@ export default function ItemDetailPage() {
   const navigate = useNavigate();
 
   const item = DUMMY_ITEMS.find((i) => i.itemCode === itemCode) ?? DUMMY_ITEMS[0];
+  useSetPageMeta('단품 실적 상세', `${item.itemName} (${item.itemCode})`);
 
   const storeBreakdown: StoreBreakdown[] = STORE_OPTIONS.map((store, i) => {
     const qty = Math.floor(item.qty * [0.25, 0.20, 0.20, 0.18, 0.17][i]);
@@ -37,15 +39,12 @@ export default function ItemDetailPage() {
   }));
 
   return (
-    <PageContainer
-      title={`단품 실적 상세`}
-      subtitle={`${item.itemName} (${item.itemCode})`}
-      actions={
+    <PageContainer>
+      <div>
         <Button variant="secondary" onClick={() => navigate(-1)}>
           ← 목록으로
         </Button>
-      }
-    >
+      </div>
       {/* 단품 정보 카드 */}
       <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
         <div className="flex items-center gap-3 mb-4">

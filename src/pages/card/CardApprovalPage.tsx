@@ -9,6 +9,7 @@ import Badge from '@/components/ui/Badge';
 import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import { useAuth } from '@/hooks/useAuth';
+import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import { shouldShowStoreSelector } from '@/utils/permissions';
 import { formatKRW, formatNumber, formatDateTime } from '@/utils/formatters';
 import { paginateArray } from '@/utils/dummy.helpers';
@@ -49,6 +50,7 @@ function rowClass(row: CardApproval): string {
 }
 
 export default function CardApprovalPage() {
+  useSetPageMeta('카드승인 조회', '카드사별 매출·승인 내역 관리 (취소/오류 포함)');
   const { currentUser, can } = useAuth();
   const [startDate, setStartDate] = useState('2025-01-01');
   const [endDate, setEndDate] = useState('2025-01-31');
@@ -85,74 +87,66 @@ export default function CardApprovalPage() {
     setPage(0);
   }
 
-  return (
-    <PageContainer
-      title="카드승인 조회"
-      subtitle="카드사별 매출·승인 내역 관리 (취소/오류 포함)"
-    >
-      {/* 필터 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <div className="flex flex-wrap gap-4 items-end">
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onStartChange={setStartDate}
-            onEndChange={setEndDate}
-            label="조회 기간"
-          />
-
-          <MultiSelect
-            options={CARD_OPTIONS}
-            selected={selectedCards}
-            onChange={(v) => { setSelectedCards(v); setPage(0); }}
-            placeholder="카드사 전체"
-            label="카드사"
-          />
-
-          {storeMode !== 'hidden' && (
-            <MultiSelect
-              options={STORE_OPTIONS}
-              selected={selectedStores}
-              onChange={(v) => { setSelectedStores(v); setPage(0); }}
-              placeholder="매장 전체"
-              label="매장 선택"
-            />
-          )}
-
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">승인 상태</span>
-            <div className="flex gap-1">
-              {STATUS_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => { setStatusFilter(opt.value); setPage(0); }}
-                  className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
-                    statusFilter === opt.value
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">승인번호</span>
-            <input
-              type="text"
-              value={approvalNo}
-              onChange={(e) => { setApprovalNo(e.target.value); setPage(0); }}
-              placeholder="승인번호 검색"
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
-            />
-          </div>
-
-          <Button>조회</Button>
+  useSetPageFilters(
+    <div className="flex flex-wrap gap-4 items-end">
+      <DateRangePicker
+        startDate={startDate}
+        endDate={endDate}
+        onStartChange={setStartDate}
+        onEndChange={setEndDate}
+        label="조회 기간"
+      />
+      <MultiSelect
+        options={CARD_OPTIONS}
+        selected={selectedCards}
+        onChange={(v) => { setSelectedCards(v); setPage(0); }}
+        placeholder="카드사 전체"
+        label="카드사"
+      />
+      {storeMode !== 'hidden' && (
+        <MultiSelect
+          options={STORE_OPTIONS}
+          selected={selectedStores}
+          onChange={(v) => { setSelectedStores(v); setPage(0); }}
+          placeholder="매장 전체"
+          label="매장 선택"
+        />
+      )}
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">승인 상태</span>
+        <div className="flex gap-1">
+          {STATUS_OPTIONS.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => { setStatusFilter(opt.value); setPage(0); }}
+              className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
+                statusFilter === opt.value
+                  ? 'bg-blue-600 text-white border-blue-600'
+                  : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
         </div>
       </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">승인번호</span>
+        <input
+          type="text"
+          value={approvalNo}
+          onChange={(e) => { setApprovalNo(e.target.value); setPage(0); }}
+          placeholder="승인번호 검색"
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 w-32"
+        />
+      </div>
+      <Button>조회</Button>
+    </div>,
+  );
+
+  return (
+    <PageContainer>
 
       {/* 카드사별 요약 카드 */}
       <div className="grid grid-cols-3 gap-2.5">

@@ -93,7 +93,8 @@ src/
 │   └── authStore.ts           # Zustand auth 스토어 (persist)
 │
 ├── hooks/
-│   └── useAuth.ts             # useAuthStore 래퍼: { currentUser, isAuthenticated, login, logout, can() }
+│   ├── useAuth.ts             # useAuthStore 래퍼: { currentUser, isAuthenticated, login, logout, can() }
+│   └── usePageMeta.tsx        # PageMetaContext + PageMetaProvider + useSetPageMeta() + useSetPageFilters() + usePageMeta() + usePageFilters()
 │
 ├── utils/
 │   ├── permissions.ts         # ROLE_LABELS, hasPermission(), canAccessMenu(), shouldShowStoreSelector()
@@ -114,10 +115,11 @@ src/
 │
 ├── components/
 │   ├── layout/
-│   │   ├── AppLayout.tsx      # Sidebar + TopHeader + <Outlet /> 래퍼, max-w-[1280px]
+│   │   ├── AppLayout.tsx      # PageMetaProvider + Sidebar + TopHeader + FilterBar + <Outlet /> 래퍼
 │   │   ├── Sidebar.tsx        # w-48, slate-900 배경, lucide 아이콘, SVG 로고마크
-│   │   ├── TopHeader.tsx      # h-12, 현재 페이지 타이틀, 사용자 정보, 로그아웃
-│   │   └── PageContainer.tsx  # 페이지 타이틀 + gap-4 수직 스택
+│   │   ├── TopHeader.tsx      # h-14, usePageMeta()로 title+subtitle 표시, 사용자 정보, 로그아웃
+│   │   ├── FilterBar.tsx      # usePageFilters()로 각 페이지의 필터 JSX를 헤더 아래 고정 렌더링
+│   │   └── PageContainer.tsx  # 순수 gap-4 수직 스택 래퍼 (title/subtitle/actions 없음)
 │   │
 │   ├── ui/
 │   │   ├── Button.tsx         # variant: primary|secondary|danger|ghost / size: sm|md|lg
@@ -295,6 +297,23 @@ PAYMENT_COLOR_FALLBACK: string                   // 매핑 없을 때 기본색
 FRANCHISE_RANK_COLORS: readonly string[]         // 8색 블루~인디고 계열
 ```
 
+### usePageMeta.tsx
+```tsx
+// 페이지 타이틀 설정 (TopHeader에 반영)
+useSetPageMeta('페이지 제목', '서브타이틀');          // 컴포넌트 최상단에서 호출
+useSetPageMeta('단품 실적 상세', `${item.itemName}`); // 동적 타이틀도 가능 (deps 자동 갱신)
+
+// 필터 JSX를 헤더 아래 FilterBar에 렌더링
+useSetPageFilters(
+  <div className="flex flex-wrap gap-4 items-end">
+    <DateRangePicker ... />
+    <Button>조회</Button>
+    <div className="ml-auto"><Button>+ 등록</Button></div>  {/* 오른쪽 정렬 */}
+  </div>,
+);
+// 언마운트 시 자동 정리 — 별도 cleanup 불필요
+```
+
 ### ChartTooltip.ts (컴포넌트 아님, 상수 파일)
 ```ts
 // 모든 recharts <Tooltip>에 스프레드해서 사용
@@ -377,7 +396,8 @@ const [open, setOpen] = useState(false);
 ### 레이아웃
 - **최대 너비**: `max-w-[1280px] mx-auto` (AppLayout에서 적용)
 - **사이드바**: `w-48 bg-slate-900` 고정
-- **헤더**: `h-12 bg-white border-b border-gray-100`
+- **헤더**: `h-14 bg-white border-b border-gray-100` (title + subtitle 2줄 수용)
+- **필터바**: `bg-white border-b border-gray-100 px-6 py-3` — 필터 없는 페이지에서는 자동 숨김
 - **페이지 패딩**: `px-6 py-5`
 - **섹션 간격**: `gap-4` (PageContainer flex-col)
 
@@ -467,12 +487,12 @@ bun run check    # Biome lint + format
 
 **현재 빌드 결과** (경고 0건):
 ```
-dist/static/css/index.css     33.5 kB
-dist/static/js/index.js       76.3 kB   (앱 코드)
+dist/static/css/index.css     34.4 kB
+dist/static/js/index.js       80.9 kB   (앱 코드)
 dist/static/js/lib-router.js  85.0 kB   (react-router)
 dist/static/js/lib-react.js   189.7 kB  (react)
-dist/static/js/[chunk].js     424.5 kB  (recharts 등)
-Total: ~815 kB
+dist/static/js/[chunk].js     424.8 kB  (recharts 등)
+Total: ~821 kB
 ```
 
 ---
@@ -521,7 +541,29 @@ src/data/auth.dummy.ts      → POST /api/auth/login (JWT 반환)
 
 9. **차트 색상 공유 패턴**: 결제수단 관련 차트(DonutChart, StackBarChart)는 `chartColors.ts`의 `PAYMENT_COLOR_LIST` / `PAYMENT_COLORS`를 사용. 새 차트 추가 시 로컬 색상 배열 정의 금지 — 반드시 `chartColors.ts`에 상수 추가 후 import.
 
-10. **recharts 도넛 중앙 텍스트**: recharts `<Label>` 컴포넌트의 `content` 콜백에서 받는 `viewBox`는 recharts 버전에 따라 `cx/cy` 미보장. **SVG text 대신 CSS absolute overlay 방식 사용**:
+11. **페이지 타이틀 패턴 (`usePageMeta`)**: 헤더와 페이지 내부 타이틀 중복 제거. 각 페이지는 `useSetPageMeta(title, subtitle)`을 컴포넌트 최상단에서 호출하여 TopHeader에 title+subtitle을 전달. PageContainer는 `flex flex-col gap-4` 순수 래퍼로만 사용.
+    ```tsx
+    // 정적 타이틀 (대부분의 페이지)
+    export default function SettlementPage() {
+      useSetPageMeta('CR정산서 — 결제수단별 실적', '결제수단별 매출 구조 분석');
+      ...
+      return <PageContainer>{/* 타이틀 없이 바로 콘텐츠 */}</PageContainer>;
+    }
+
+    // 동적 타이틀 (ItemDetailPage, UserManagePage)
+    export default function ItemDetailPage() {
+      const item = DUMMY_ITEMS.find(...) ?? DUMMY_ITEMS[0];
+      useSetPageMeta('단품 실적 상세', `${item.itemName} (${item.itemCode})`);
+      ...
+    }
+    ```
+    - 이전에 `PageContainer`의 `actions` prop에 두던 버튼은 필터 행 `ml-auto`로 이동
+    - `TopHeader` 높이: h-12 → h-14 (subtitle 2줄 수용)
+
+13. **필터바 슬롯 패턴 (`useSetPageFilters`)**: 각 페이지의 검색 필터를 스크롤 영역 밖 상단 고정 위치(FilterBar)에 렌더링. 페이지는 `useSetPageFilters(<JSX>)`를 호출해 필터 JSX를 Context에 주입, `FilterBar` 컴포넌트가 `usePageFilters()`로 읽어 렌더링. 필터 상태(useState)와 핸들러는 여전히 페이지 내부에 있으며 클로저로 참조됨 — Context를 통해 ReactNode만 전달. `useSetPageFilters`는 deps 없는 `useEffect`로 매 렌더마다 동기화하고, 별도 `useEffect(cleanup, [setFilters])`로 언마운트 시 자동 제거.
+    - **⚠️ 무한 루프 방지를 위한 Context 분리**: `PageMetaSettersContext`(세터, 안정적)와 `PageMetaValuesContext`(값, 변경됨)로 분리. 페이지는 세터 컨텍스트만 구독하므로 `setFilters(node)` 호출 후 Values 컨텍스트가 업데이트되어도 페이지가 재렌더되지 않아 무한 루프가 발생하지 않는다. `useState` 세터(`setMeta`, `setFilters`)는 React가 참조 안정성을 보장하므로 `useMemo(..., [setMeta, setFilters])`는 절대 재생성되지 않는다.
+
+12. **recharts 도넛 중앙 텍스트**: recharts `<Label>` 컴포넌트의 `content` 콜백에서 받는 `viewBox`는 recharts 버전에 따라 `cx/cy` 미보장. **SVG text 대신 CSS absolute overlay 방식 사용**:
     ```tsx
     // 올바름 — CSS overlay (PaymentDonutChart 참고)
     <div className="relative">

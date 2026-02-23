@@ -9,6 +9,7 @@ import Table from '@/components/ui/Table';
 import PaymentDonutChart from '@/components/charts/PaymentDonutChart';
 import PaymentStackBarChart from '@/components/charts/PaymentStackBarChart';
 import { useAuth } from '@/hooks/useAuth';
+import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import { shouldShowStoreSelector } from '@/utils/permissions';
 import { formatKRW, formatNumber, formatRatio } from '@/utils/formatters';
 import { DUMMY_SETTLEMENT, type PaymentBreakdown } from '@/data/settlement.dummy';
@@ -24,6 +25,7 @@ const PAYMENT_TYPE_OPTIONS = [
 ];
 
 export default function SettlementPage() {
+  useSetPageMeta('CR정산서 — 결제수단별 실적', '결제수단별 매출 구조 분석');
   const { currentUser, can } = useAuth();
   const [viewMode, setViewMode] = useState<ViewMode>('period');
   const [startDate, setStartDate] = useState('2025-01-01');
@@ -32,6 +34,54 @@ export default function SettlementPage() {
   const [selectedPayments, setSelectedPayments] = useState<string[]>([]);
 
   const storeMode = currentUser ? shouldShowStoreSelector(currentUser.role) : 'hidden';
+
+  useSetPageFilters(
+    <div className="flex flex-wrap gap-4 items-end">
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">조회 방식</span>
+        <div className="flex border border-gray-200 rounded-lg overflow-hidden">
+          <button
+            type="button"
+            onClick={() => setViewMode('daily')}
+            className={`px-4 py-2 text-sm transition-colors ${viewMode === 'daily' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+          >
+            데일리
+          </button>
+          <button
+            type="button"
+            onClick={() => setViewMode('period')}
+            className={`px-4 py-2 text-sm transition-colors ${viewMode === 'period' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
+          >
+            기간별
+          </button>
+        </div>
+      </div>
+      <DateRangePicker
+        startDate={startDate}
+        endDate={endDate}
+        onStartChange={setStartDate}
+        onEndChange={setEndDate}
+        label="조회 기간"
+      />
+      {storeMode !== 'hidden' && (
+        <MultiSelect
+          options={STORE_OPTIONS}
+          selected={selectedStores}
+          onChange={setSelectedStores}
+          placeholder="매장 전체"
+          label="매장 선택"
+        />
+      )}
+      <MultiSelect
+        options={PAYMENT_TYPE_OPTIONS}
+        selected={selectedPayments}
+        onChange={setSelectedPayments}
+        placeholder="결제수단 전체"
+        label="결제수단"
+      />
+      <Button>조회</Button>
+    </div>,
+  );
 
   const filteredBreakdown =
     selectedPayments.length === 0
@@ -44,63 +94,7 @@ export default function SettlementPage() {
   const totalCount = filteredBreakdown.reduce((s, b) => s + b.count, 0);
 
   return (
-    <PageContainer
-      title="CR정산서 — 결제수단별 실적"
-      subtitle="결제수단별 매출 구조 분석"
-    >
-      {/* 필터 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <div className="flex flex-wrap gap-4 items-end">
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">조회 방식</span>
-            <div className="flex border border-gray-200 rounded-lg overflow-hidden">
-              <button
-                type="button"
-                onClick={() => setViewMode('daily')}
-                className={`px-4 py-2 text-sm transition-colors ${viewMode === 'daily' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-              >
-                데일리
-              </button>
-              <button
-                type="button"
-                onClick={() => setViewMode('period')}
-                className={`px-4 py-2 text-sm transition-colors ${viewMode === 'period' ? 'bg-blue-600 text-white' : 'text-gray-600 hover:bg-gray-50'}`}
-              >
-                기간별
-              </button>
-            </div>
-          </div>
-
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onStartChange={setStartDate}
-            onEndChange={setEndDate}
-            label="조회 기간"
-          />
-
-          {storeMode !== 'hidden' && (
-            <MultiSelect
-              options={STORE_OPTIONS}
-              selected={selectedStores}
-              onChange={setSelectedStores}
-              placeholder="매장 전체"
-              label="매장 선택"
-            />
-          )}
-
-          <MultiSelect
-            options={PAYMENT_TYPE_OPTIONS}
-            selected={selectedPayments}
-            onChange={setSelectedPayments}
-            placeholder="결제수단 전체"
-            label="결제수단"
-          />
-
-          <Button>조회</Button>
-        </div>
-      </div>
-
+    <PageContainer>
       {/* KPI */}
       <div className="grid grid-cols-3 gap-4">
         <KpiCard label="총 매출액" value={formatKRW(totalSales)} icon={<Banknote size={15} />} />

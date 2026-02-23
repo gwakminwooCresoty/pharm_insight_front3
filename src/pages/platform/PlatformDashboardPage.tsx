@@ -10,6 +10,7 @@ import Pagination from '@/components/ui/Pagination';
 import FranchiseRankBarChart from '@/components/charts/FranchiseRankBarChart';
 import TrendLineChart from '@/components/charts/TrendLineChart';
 import { formatKRW, formatNumber, formatRatio } from '@/utils/formatters';
+import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import { paginateArray } from '@/utils/dummy.helpers';
 import {
   DUMMY_PLATFORM_KPI,
@@ -27,6 +28,7 @@ const platformTrend = DUMMY_TREND_PLATFORM.map((d) => ({
 }));
 
 export default function PlatformDashboardPage() {
+  useSetPageMeta('플랫폼 전체 현황 대시보드', '전체 프랜차이즈 매출 현황 및 이상 징후 모니터링');
   const [startDate, setStartDate] = useState('2025-01-01');
   const [endDate, setEndDate] = useState('2025-01-31');
   const [page, setPage] = useState(0);
@@ -34,24 +36,21 @@ export default function PlatformDashboardPage() {
 
   const paged = paginateArray(DUMMY_FRANCHISES, page, PAGE_SIZE);
 
+  useSetPageFilters(
+    <div className="flex flex-wrap gap-4 items-end">
+      <DateRangePicker
+        startDate={startDate}
+        endDate={endDate}
+        onStartChange={setStartDate}
+        onEndChange={setEndDate}
+        label="조회 기간"
+      />
+      <Button>조회</Button>
+    </div>,
+  );
+
   return (
-    <PageContainer
-      title="플랫폼 전체 현황 대시보드"
-      subtitle="전체 프랜차이즈 매출 현황 및 이상 징후 모니터링"
-    >
-      {/* 필터 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <div className="flex flex-wrap gap-4 items-end">
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onStartChange={setStartDate}
-            onEndChange={setEndDate}
-            label="조회 기간"
-          />
-          <Button>조회</Button>
-        </div>
-      </div>
+    <PageContainer>
 
       {/* 플랫폼 KPI */}
       <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">

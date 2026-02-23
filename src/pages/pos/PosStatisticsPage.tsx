@@ -10,6 +10,7 @@ import Table from '@/components/ui/Table';
 import Pagination from '@/components/ui/Pagination';
 import TrendLineChart from '@/components/charts/TrendLineChart';
 import { useAuth } from '@/hooks/useAuth';
+import { useSetPageMeta, useSetPageFilters } from '@/hooks/usePageMeta';
 import { shouldShowStoreSelector } from '@/utils/permissions';
 import { formatKRW, formatNumber, formatRatio } from '@/utils/formatters';
 import { paginateArray } from '@/utils/dummy.helpers';
@@ -51,6 +52,7 @@ function getTrendData(axisType: AxisType) {
 }
 
 export default function PosStatisticsPage() {
+  useSetPageMeta('POS 실적 통합 조회', '단품 기준 판매량/매출 관리, 기간 비교 실적 분석');
   const { currentUser, can } = useAuth();
   const navigate = useNavigate();
   const [axisType, setAxisType] = useState<AxisType>('DATE');
@@ -76,86 +78,79 @@ export default function PosStatisticsPage() {
   const trendData = getTrendData(axisType);
   const showCompareChart = showCompare && compareStart && compareEnd;
 
-  return (
-    <PageContainer
-      title="POS 실적 통합 조회"
-      subtitle="단품 기준 판매량/매출 관리, 기간 비교 실적 분석"
-    >
-      {/* 필터 영역 */}
-      <div className="bg-white rounded-lg border border-gray-100 p-4 shadow-sm">
-        <div className="flex flex-wrap gap-4 items-end">
-          <DateRangePicker
-            startDate={startDate}
-            endDate={endDate}
-            onStartChange={setStartDate}
-            onEndChange={setEndDate}
-            label="조회 기간"
-          />
-
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">조회 축</span>
-            <div className="flex gap-1">
-              {AXIS_OPTIONS.map((opt) => (
-                <button
-                  key={opt.value}
-                  type="button"
-                  onClick={() => setAxisType(opt.value)}
-                  className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
-                    axisType === opt.value
-                      ? 'bg-blue-600 text-white border-blue-600'
-                      : 'border-gray-200 text-gray-600 hover:bg-gray-50'
-                  }`}
-                >
-                  {opt.label}
-                </button>
-              ))}
-            </div>
+  useSetPageFilters(
+    <>
+      <div className="flex flex-wrap gap-4 items-end">
+        <DateRangePicker
+          startDate={startDate}
+          endDate={endDate}
+          onStartChange={setStartDate}
+          onEndChange={setEndDate}
+          label="조회 기간"
+        />
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500 font-medium">조회 축</span>
+          <div className="flex gap-1">
+            {AXIS_OPTIONS.map((opt) => (
+              <button
+                key={opt.value}
+                type="button"
+                onClick={() => setAxisType(opt.value)}
+                className={`px-3 py-2 rounded-lg text-sm border transition-colors ${
+                  axisType === opt.value
+                    ? 'bg-blue-600 text-white border-blue-600'
+                    : 'border-gray-200 text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {opt.label}
+              </button>
+            ))}
           </div>
-
-          {storeMode !== 'hidden' && (
-            <MultiSelect
-              options={STORE_OPTIONS}
-              selected={selectedStores}
-              onChange={setSelectedStores}
-              placeholder="매장 전체"
-              label="매장 선택"
-            />
-          )}
-
-          <div className="flex flex-col gap-1">
-            <span className="text-xs text-gray-500 font-medium">상품 분류</span>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value as CategoryCode)}
-              className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {CATEGORY_OPTIONS.map((opt) => (
-                <option key={opt.value} value={opt.value}>
-                  {opt.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
-          <Button onClick={() => setShowCompare(!showCompare)} variant="secondary">
-            {showCompare ? '비교기간 닫기' : '기간 비교'}
-          </Button>
-
-          <Button onClick={() => setPage(0)}>조회</Button>
         </div>
-
-        {showCompare && (
-          <div className="mt-4 pt-4 border-t border-gray-100">
-            <DateRangePicker
-              startDate={compareStart}
-              endDate={compareEnd}
-              onStartChange={setCompareStart}
-              onEndChange={setCompareEnd}
-              label="비교 기간"
-            />
-          </div>
+        {storeMode !== 'hidden' && (
+          <MultiSelect
+            options={STORE_OPTIONS}
+            selected={selectedStores}
+            onChange={setSelectedStores}
+            placeholder="매장 전체"
+            label="매장 선택"
+          />
         )}
+        <div className="flex flex-col gap-1">
+          <span className="text-xs text-gray-500 font-medium">상품 분류</span>
+          <select
+            value={category}
+            onChange={(e) => setCategory(e.target.value as CategoryCode)}
+            className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            {CATEGORY_OPTIONS.map((opt) => (
+              <option key={opt.value} value={opt.value}>
+                {opt.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <Button onClick={() => setShowCompare(!showCompare)} variant="secondary">
+          {showCompare ? '비교기간 닫기' : '기간 비교'}
+        </Button>
+        <Button onClick={() => setPage(0)}>조회</Button>
       </div>
+      {showCompare && (
+        <div className="mt-3 pt-3 border-t border-gray-100">
+          <DateRangePicker
+            startDate={compareStart}
+            endDate={compareEnd}
+            onStartChange={setCompareStart}
+            onEndChange={setCompareEnd}
+            label="비교 기간"
+          />
+        </div>
+      )}
+    </>,
+  );
+
+  return (
+    <PageContainer>
 
       {/* KPI 요약 카드 */}
       <div className="grid grid-cols-3 gap-4">
