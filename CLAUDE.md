@@ -25,6 +25,7 @@
 | 상태관리 | **Zustand** 5 + `persist` | localStorage 키: `pharminsight-auth` |
 | 라우팅 | **react-router-dom** 7 | `createBrowserRouter` + `RouterProvider` |
 | 차트 | **recharts** 3 | `ResponsiveContainer` 필수 래퍼 |
+| 지도 | **maplibre-gl** + **react-map-gl** | CartoDB 타일셋, 커스텀 상태 마커 기능 |
 | 폼 | **react-hook-form** 7 | TenantManagePage, UserManagePage, PermissionGroupPage에서 사용 |
 | 아이콘 | **lucide-react** 0.575 | 이모지 일절 미사용, SVG 아이콘만 사용 |
 | 패키지 매니저 | **Bun** | `bun add`, `bun run build` |
@@ -74,7 +75,8 @@ type Permission =
   | 'EXPORT_DATA'       // 엑셀 다운로드
   | 'USER_MANAGE'       // 사용자 관리
   | 'TENANT_MANAGE'     // 테넌트 관리
-  | 'PLATFORM_DASHBOARD'; // 플랫폼 대시보드
+  | 'PLATFORM_DASHBOARD'// 플랫폼 대시보드
+  | 'FRANCHISE_STORE_MANAGE'; // 가맹점 관리 (지도+리스트)
 ```
 
 ---
@@ -141,6 +143,9 @@ src/
 │       ├── PaymentStackBarChart.tsx # BarChart stackId="payment" 결제수단별
 │       └── FranchiseRankBarChart.tsx# BarChart 프랜차이즈 랭킹, height=280, XAxis angle=-25°
 │
+├── map/
+│       └── StoreMap.tsx             # MapLibre + react-map-gl 연동 맵 컴포넌트 (`fitBounds` 동적 줌 지원)
+│
 └── pages/
     ├── LoginPage.tsx              # 테넌트 로그인 (/login): BRANDING 적용, PLATFORM_ADMIN 제외
     ├── PlatformLoginPage.tsx      # 플랫폼 관리자 전용 로그인 (/platform/login): 다크 전체화면
@@ -151,12 +156,16 @@ src/
     │   └── SettlementPage.tsx     # CR정산서 — 결제수단별
     ├── card/
     │   └── CardApprovalPage.tsx   # 카드승인 조회
-    └── platform/
-        ├── PlatformDashboardPage.tsx  # 플랫폼 전체 현황
+    ├── platform/
+        ├── PlatformDashboardPage.tsx  # 플랫폼 전체 현황 (KPI 카드, 차트)
+        ├── PlatformInsightMapPage.tsx # 가맹점 인사이트 맵 (전체 프랜차이즈 분포)
+        ├── SystemMonitorPage.tsx      # 플랫폼 시스템 모니터링 (서버/DB 상태)
         ├── TenantManagePage.tsx       # 테넌트(프랜차이즈) CRUD
         ├── TenantPermissionModal.tsx  # 테넌트별 권한 그룹 배정 + 메뉴 예외 설정 모달
         ├── UserManagePage.tsx         # 사용자 관리 (초대, 역할 수정, 상태 토글)
         └── PermissionGroupPage.tsx    # 권한 그룹 CRUD (그룹명·설명·포함메뉴 관리)
+    └── franchise/
+        └── StoreManagePage.tsx        # 프랜차이즈 가맹점 관리 (지도와 목록 동기화)
 ```
 
 ---
@@ -172,10 +181,13 @@ src/
   /pos/items/:itemCode   → ItemDetailPage
   /settlement            → RoleGuard(SETTLEMENT_READ) → SettlementPage
   /card/approvals        → RoleGuard(CARD_APPROVAL_READ) → CardApprovalPage
-  /platform/dashboard    → RoleGuard(PLATFORM_DASHBOARD) → PlatformDashboardPage
+  /platform/dashboard         → RoleGuard(PLATFORM_DASHBOARD) → PlatformDashboardPage
+  /platform/insight-map       → RoleGuard(PLATFORM_DASHBOARD) → PlatformInsightMapPage
+  /platform/system-monitor    → RoleGuard(PLATFORM_DASHBOARD) → SystemMonitorPage
   /platform/tenants           → RoleGuard(TENANT_MANAGE) → TenantManagePage
   /platform/users             → RoleGuard(USER_MANAGE) → UserManagePage
   /platform/permission-groups → RoleGuard(TENANT_MANAGE) → PermissionGroupPage
+  /franchise/stores           → RoleGuard(FRANCHISE_STORE_MANAGE) → StoreManagePage
 ```
 
 - **PrivateRoute**: 미인증 시 `/platform/*` 경로는 `/platform/login`으로, 나머지는 `/login`으로 redirect
@@ -266,10 +278,11 @@ CARD_OPTIONS: { value, label }[]
 ### platform.dummy.ts
 ```ts
 DUMMY_PLATFORM_KPI: { totalSales, totalCustomerCount, activeFranchiseCount, activeStoreCount, compareRatio }
-DUMMY_FRANCHISES: FranchiseSummary[]  // 12개 프랜차이즈
+DUMMY_FRANCHISES: FranchiseSummary[] // 12개 프랜차이즈
 DUMMY_PLATFORM_USERS: PlatformUser[] // 26명
 DUMMY_ANOMALIES: AnomalyAlert[]      // 이상 징후 매장 (매출 -30% 이상)
 DUMMY_TREND_PLATFORM: PlatformTrend[]// 30일 플랫폼 전체 트렌드
+DUMMY_STORES: StoreSummary[]         // 전국 가맹점 지도/리스트용 상세 매장 데이터 (좌표 포함)
 ```
 
 ---
