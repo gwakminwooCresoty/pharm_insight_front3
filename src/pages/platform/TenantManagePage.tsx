@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import PageContainer from '@/components/layout/PageContainer';
 import Badge from '@/components/ui/Badge';
@@ -13,6 +13,7 @@ import {
   type FranchiseSummary,
   type FranchiseStatus,
 } from '@/data/platform.dummy';
+import TenantPermissionModal from './TenantPermissionModal';
 
 type FormData = {
   franchiseName: string;
@@ -35,6 +36,63 @@ function statusBadge(status: FranchiseStatus) {
   return <Badge color="gray">비활성</Badge>;
 }
 
+function TenantFilterBar({
+  onFilterChange,
+  onCreateClick,
+}: {
+  onFilterChange: (keyword: string, status: string) => void;
+  onCreateClick: () => void;
+}) {
+  const [keyword, setKeyword] = useState('');
+  const [status, setStatus] = useState('');
+  const [isComposing, setIsComposing] = useState(false);
+
+  useEffect(() => {
+    // 한글 입력 중일 때는 타이머 작동을 잠시 보류
+    if (isComposing) return;
+
+    const timer = setTimeout(() => {
+      onFilterChange(keyword, status);
+    }, 150);
+    return () => clearTimeout(timer);
+  }, [keyword, status, isComposing, onFilterChange]);
+
+  return (
+    <div className="flex gap-3 items-end">
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">프랜차이즈명</span>
+        <input
+          type="text"
+          value={keyword}
+          onChange={(e) => setKeyword(e.target.value)}
+          onCompositionStart={() => setIsComposing(true)}
+          onCompositionEnd={() => setIsComposing(false)}
+          placeholder="이름 검색"
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+      <div className="flex flex-col gap-1">
+        <span className="text-xs text-gray-500 font-medium">상태</span>
+        <select
+          value={status}
+          onChange={(e) => setStatus(e.target.value)}
+          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+          <option value="">전체</option>
+          <option value="ACTIVE">활성</option>
+          <option value="INACTIVE">비활성</option>
+          <option value="SUSPENDED">정지</option>
+        </select>
+      </div>
+      <div className="ml-auto">
+        <Button onClick={onCreateClick}>
+          + 프랜차이즈 등록
+        </Button>
+      </div>
+    </div>
+  );
+}
+
 export default function TenantManagePage() {
   useSetPageMeta('테넌트 관리', '프랜차이즈 등록 및 계약 정보 관리');
   const [franchises, setFranchises] = useState<FranchiseSummary[]>(DUMMY_FRANCHISES);
@@ -46,6 +104,7 @@ export default function TenantManagePage() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editTarget, setEditTarget] = useState<FranchiseSummary | null>(null);
   const [statusTarget, setStatusTarget] = useState<FranchiseSummary | null>(null);
+  const [permissionTarget, setPermissionTarget] = useState<FranchiseSummary | null>(null);
 
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const {
@@ -61,38 +120,21 @@ export default function TenantManagePage() {
   });
   const paged = paginateArray(filtered, page, PAGE_SIZE);
 
-  useSetPageFilters(
-    <div className="flex gap-3 items-end">
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">프랜차이즈명</span>
-        <input
-          type="text"
-          value={keyword}
-          onChange={(e) => { setKeyword(e.target.value); setPage(0); }}
-          placeholder="이름 검색"
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
-      <div className="flex flex-col gap-1">
-        <span className="text-xs text-gray-500 font-medium">상태</span>
-        <select
-          value={statusFilter}
-          onChange={(e) => { setStatusFilter(e.target.value); setPage(0); }}
-          className="border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option value="">전체</option>
-          <option value="ACTIVE">활성</option>
-          <option value="INACTIVE">비활성</option>
-          <option value="SUSPENDED">정지</option>
-        </select>
-      </div>
-      <div className="ml-auto">
-        <Button onClick={() => { reset(); setCreateOpen(true); }}>
-          + 프랜차이즈 등록
-        </Button>
-      </div>
-    </div>,
+  const handleFilterChange = (newKeyword: string, newStatus: string) => {
+    setKeyword(newKeyword);
+    setStatusFilter(newStatus);
+    setPage(0);
+  };
+
+  const filterNode = (
+    <TenantFilterBar
+      onFilterChange={handleFilterChange}
+      onCreateClick={() => { reset(); setCreateOpen(true); }}
+    />
   );
+
+  // useSetPageFilters 내에서 의존성 배열에 넣지 않아도 내부적으로 상태 변화가 생기면 node 전체를 다시 렌더링하도록 훅 내부에서 처리하고 있습니다.
+  useSetPageFilters(filterNode);
 
   function handleCreate(data: FormData) {
     const newFranchise: FranchiseSummary = {
@@ -187,10 +229,40 @@ export default function TenantManagePage() {
               header: '계약 만료일',
             },
             {
+              key: 'permissions',
+              header: '권한 수준 (요약)',
+              render: (row) => {
+                // 더미 데이터 생성을 위해 ID 기반으로 간단한 규칙 적용
+                const idNum = parseInt(row.franchiseId.replace(/\D/g, '') || '0', 10);
+                const hasPremium = idNum % 2 === 1;
+                const exceptionCount = idNum % 3;
+
+                return (
+                  <div className="flex flex-wrap gap-1">
+                    <Badge color="green">기본</Badge>
+                    {hasPremium && <Badge color="blue">프리미엄</Badge>}
+                    {exceptionCount > 0 && (
+                      <Badge color="gray">예외 {exceptionCount}건</Badge>
+                    )}
+                  </div>
+                );
+              },
+            },
+            {
               key: 'actions',
               header: '관리',
               render: (row) => (
                 <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="secondary"
+                    onClick={(e) => {
+                      (e as React.MouseEvent).stopPropagation();
+                      setPermissionTarget(row);
+                    }}
+                  >
+                    권한설정
+                  </Button>
                   <Button
                     size="sm"
                     variant="secondary"
@@ -300,6 +372,12 @@ export default function TenantManagePage() {
           </div>
         </form>
       </Modal>
+
+      {/* 권한 설정 모달 */}
+      <TenantPermissionModal
+        tenant={permissionTarget}
+        onClose={() => setPermissionTarget(null)}
+      />
     </PageContainer>
   );
 }
