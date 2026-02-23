@@ -144,7 +144,7 @@ function GroupForm({
 // ─── 메인 페이지 ────────────────────────────────────────────────────────────
 
 export default function PermissionGroupPage() {
-  useSetPageMeta('권한 그룹 관리', '테넌트에 부여할 권한 그룹을 정의·관리합니다');
+  useSetPageMeta('권한 그룹 관리', '프랜차이즈에 부여할 권한 그룹을 정의·관리합니다');
 
   const [groups, setGroups] = useState<PermissionGroup[]>(DUMMY_PERMISSION_GROUPS);
   const [keyword, setKeyword] = useState('');
@@ -414,7 +414,7 @@ export default function PermissionGroupPage() {
         <div className="flex flex-col gap-4">
           <p className="text-sm text-gray-700">
             <strong className="text-gray-900">{deleteTarget?.name}</strong> 그룹을 삭제하면
-            이 그룹이 적용된 테넌트의 권한에 영향을 미칠 수 있습니다. 계속하시겠습니까?
+            이 그룹이 적용된 프랜차이즈의 권한에 영향을 미칠 수 있습니다. 계속하시겠습니까?
           </p>
           {deleteTarget && deleteTarget.menuIds.length > 0 && (
             <div className="bg-amber-50 border border-amber-200 rounded-lg px-4 py-3 text-xs text-amber-700">

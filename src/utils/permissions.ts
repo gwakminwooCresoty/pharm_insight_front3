@@ -18,9 +18,9 @@ export function canAccessMenu(user: AuthUser, menuKey: string): boolean {
     settlement: ['SETTLEMENT_READ'],
     card: ['CARD_APPROVAL_READ'],
     'platform-dashboard': ['PLATFORM_DASHBOARD'],
-    'platform-tenants': ['TENANT_MANAGE'],
+    'platform-franchises': ['FRANCHISE_MANAGE'],
     'platform-users': ['USER_MANAGE'],
-    'permission-groups': ['TENANT_MANAGE'],
+    'permission-groups': ['FRANCHISE_MANAGE'],
     'franchise-stores': ['FRANCHISE_STORE_MANAGE'],
   };
   const required = menuPermissions[menuKey];

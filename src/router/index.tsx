@@ -112,9 +112,9 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'platform/tenants',
+        path: 'platform/franchises',
         element: (
-          <RoleGuard permission="TENANT_MANAGE">
+          <RoleGuard permission="FRANCHISE_MANAGE">
             <TenantManagePage />
           </RoleGuard>
         ),
@@ -130,7 +130,7 @@ export const router = createBrowserRouter([
       {
         path: 'platform/permission-groups',
         element: (
-          <RoleGuard permission="TENANT_MANAGE">
+          <RoleGuard permission="FRANCHISE_MANAGE">
             <PermissionGroupPage />
           </RoleGuard>
         ),

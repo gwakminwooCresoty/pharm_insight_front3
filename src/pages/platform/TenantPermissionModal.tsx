@@ -6,25 +6,25 @@ import type { FranchiseSummary } from '@/data/platform.dummy';
 import { PERMISSION_MENUS, DUMMY_PERMISSION_GROUPS } from '@/data/permission.dummy';
 
 interface TenantPermissionModalProps {
-    tenant: FranchiseSummary | null;
+    franchise: FranchiseSummary | null;
     onClose: () => void;
 }
 
 type MenuStatus = 'add' | 'deny' | null;
 
-export default function TenantPermissionModal({ tenant, onClose }: TenantPermissionModalProps) {
+export default function TenantPermissionModal({ franchise, onClose }: TenantPermissionModalProps) {
     const [useDefault, setUseDefault] = useState(true);
     const [assignedGroups, setAssignedGroups] = useState<string[]>([]);
     const [exceptions, setExceptions] = useState<Record<string, MenuStatus>>({});
 
     // 모달 열릴 때 초기화. 실제로는 API 호출로 현재 권한 세팅을 불러와야 함
     useEffect(() => {
-        if (tenant) {
+        if (franchise) {
             setUseDefault(true);
             setAssignedGroups([]);
             setExceptions({});
         }
-    }, [tenant]);
+    }, [franchise]);
 
     // 상속 권한 계산
     const baseMenuIds = useMemo(() => {
@@ -100,7 +100,7 @@ export default function TenantPermissionModal({ tenant, onClose }: TenantPermiss
     };
 
     return (
-        <Modal open={!!tenant} onClose={onClose} title={`권한설정 — ${tenant?.franchiseName || ''}`} size="lg">
+        <Modal open={!!franchise} onClose={onClose} title={`권한설정 — ${franchise?.franchiseName || ''}`} size="lg">
             <div className="flex flex-col gap-6">
 
                 {/* 1. 기본 권한 */}
@@ -111,7 +111,7 @@ export default function TenantPermissionModal({ tenant, onClose }: TenantPermiss
                             <Badge color={useDefault ? 'green' : 'gray'}>{useDefault ? 'ON' : 'OFF'}</Badge>
                         </h4>
                         <p className="text-sm text-gray-500 mt-1">
-                            테넌트가 가져야 할 최소 필수 메뉴들 (대시보드, 매장 관리 등)을 기본으로 활성화합니다.
+                            프랜차이즈가 가져야 할 최소 필수 메뉴들 (대시보드, 매장 관리 등)을 기본으로 활성화합니다.
                         </p>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">

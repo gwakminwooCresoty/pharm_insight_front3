@@ -41,9 +41,9 @@ const PLATFORM_MENU_ITEMS: MenuItem[] = [
     icon: <Activity size={15} />,
   },
   {
-    path: '/platform/tenants',
-    label: '테넌트 관리',
-    menuKey: 'tenant-manage',
+    path: '/platform/franchises',
+    label: '프랜차이즈 관리',
+    menuKey: 'franchise-manage',
     icon: <Building2 size={15} />,
   },
   {

@@ -22,7 +22,7 @@ export const DUMMY_ACCOUNTS: DummyAccount[] = [
       'CARD_APPROVAL_READ',
       'EXPORT_DATA',
       'USER_MANAGE',
-      'TENANT_MANAGE',
+      'FRANCHISE_MANAGE',
       'PLATFORM_DASHBOARD',
       'FRANCHISE_STORE_MANAGE',
     ],

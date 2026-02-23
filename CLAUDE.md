@@ -74,7 +74,7 @@ type Permission =
   | 'CARD_APPROVAL_READ'// 카드승인 조회
   | 'EXPORT_DATA'       // 엑셀 다운로드
   | 'USER_MANAGE'       // 사용자 관리
-  | 'TENANT_MANAGE'     // 테넌트 관리
+  | 'FRANCHISE_MANAGE'     // 프랜차이즈 관리
   | 'PLATFORM_DASHBOARD'// 플랫폼 대시보드
   | 'FRANCHISE_STORE_MANAGE'; // 가맹점 관리 (지도+리스트)
 ```
@@ -147,7 +147,7 @@ src/
 │       └── StoreMap.tsx             # MapLibre + react-map-gl 연동 맵 컴포넌트 (`fitBounds` 동적 줌 지원)
 │
 └── pages/
-    ├── LoginPage.tsx              # 테넌트 로그인 (/login): BRANDING 적용, PLATFORM_ADMIN 제외
+    ├── LoginPage.tsx              # 프랜차이즈 로그인 (/login): BRANDING 적용, PLATFORM_ADMIN 제외
     ├── PlatformLoginPage.tsx      # 플랫폼 관리자 전용 로그인 (/platform/login): 다크 전체화면
     ├── pos/
     │   ├── PosStatisticsPage.tsx  # POS 실적 통합 조회 (메인)
@@ -160,8 +160,8 @@ src/
         ├── PlatformDashboardPage.tsx  # 플랫폼 전체 현황 (KPI 카드, 차트)
         ├── PlatformInsightMapPage.tsx # 가맹점 인사이트 맵 (전체 프랜차이즈 분포)
         ├── SystemMonitorPage.tsx      # 플랫폼 시스템 모니터링 (서버/DB 상태)
-        ├── TenantManagePage.tsx       # 테넌트(프랜차이즈) CRUD
-        ├── TenantPermissionModal.tsx  # 테넌트별 권한 그룹 배정 + 메뉴 예외 설정 모달
+        ├── TenantManagePage.tsx       # 프랜차이즈(프랜차이즈) CRUD
+        ├── TenantPermissionModal.tsx  # 프랜차이즈별 권한 그룹 배정 + 메뉴 예외 설정 모달
         ├── UserManagePage.tsx         # 사용자 관리 (초대, 역할 수정, 상태 토글)
         └── PermissionGroupPage.tsx    # 권한 그룹 CRUD (그룹명·설명·포함메뉴 관리)
     └── franchise/
@@ -173,7 +173,7 @@ src/
 ## 4. 라우팅 구조
 
 ```
-/login                   → LoginPage          (테넌트 로그인, 비로그인 접근 가능)
+/login                   → LoginPage          (프랜차이즈 로그인, 비로그인 접근 가능)
 /platform/login          → PlatformLoginPage  (플랫폼 관리자 전용 로그인)
 /                        → PrivateRoute → AppLayout
   /                      → redirect → /pos/statistics
@@ -184,9 +184,9 @@ src/
   /platform/dashboard         → RoleGuard(PLATFORM_DASHBOARD) → PlatformDashboardPage
   /platform/insight-map       → RoleGuard(PLATFORM_DASHBOARD) → PlatformInsightMapPage
   /platform/system-monitor    → RoleGuard(PLATFORM_DASHBOARD) → SystemMonitorPage
-  /platform/tenants           → RoleGuard(TENANT_MANAGE) → TenantManagePage
+  /platform/franchises           → RoleGuard(FRANCHISE_MANAGE) → TenantManagePage
   /platform/users             → RoleGuard(USER_MANAGE) → UserManagePage
-  /platform/permission-groups → RoleGuard(TENANT_MANAGE) → PermissionGroupPage
+  /platform/permission-groups → RoleGuard(FRANCHISE_MANAGE) → PermissionGroupPage
   /franchise/stores           → RoleGuard(FRANCHISE_STORE_MANAGE) → StoreManagePage
 ```
 
@@ -201,7 +201,7 @@ src/
 ### 로그인 진입점 분리
 | 대상 | URL | 페이지 |
 |---|---|---|
-| 테넌트 사용자 (FRANCHISE_* / REGION_* / STORE_*) | `/login` | LoginPage |
+| 프랜차이즈 사용자 (FRANCHISE_* / REGION_* / STORE_*) | `/login` | LoginPage |
 | 플랫폼 관리자 (PLATFORM_ADMIN) | `/platform/login` | PlatformLoginPage |
 
 - `LoginPage`: PLATFORM_ADMIN 계정 입력 시 오류 메시지로 `/platform/login` 안내. 로그인 성공 → `/`
@@ -506,7 +506,7 @@ text-xs font-semibold text-gray-500 uppercase tracking-wide mb-3
 - 삭제 확인 모달: 포함 메뉴 목록을 amber 경고박스로 표시
 - `permission.dummy.ts`의 `PERMISSION_MENUS` / `DUMMY_PERMISSION_GROUPS` 공유 → `TenantPermissionModal`도 동일 소스 사용
 
-### TenantManagePage (`/platform/tenants`)
+### TenantManagePage (`/platform/franchises`)
 - react-hook-form으로 생성/수정 모달 구현
 - 상태 변경(ACTIVE ↔ SUSPENDED) 확인 모달
 - 로컬 state로 DUMMY_FRANCHISES 복사본 관리 (API 연동 전까지)

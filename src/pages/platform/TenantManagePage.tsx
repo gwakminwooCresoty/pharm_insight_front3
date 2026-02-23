@@ -97,7 +97,7 @@ function TenantFilterBar({
 }
 
 export default function TenantManagePage() {
-  useSetPageMeta('테넌트 관리', '프랜차이즈 등록 및 계약 정보 관리');
+  useSetPageMeta('프랜차이즈 관리', '프랜차이즈 등록 및 계약 정보 관리');
   const [franchises, setFranchises] = useState<FranchiseSummary[]>(DUMMY_FRANCHISES);
   const [keyword, setKeyword] = useState('');
   const [statusFilter, setStatusFilter] = useState('');
@@ -390,7 +390,7 @@ export default function TenantManagePage() {
 
       {/* 권한 설정 모달 */}
       <TenantPermissionModal
-        tenant={permissionTarget}
+        franchise={permissionTarget}
         onClose={() => setPermissionTarget(null)}
       />
 

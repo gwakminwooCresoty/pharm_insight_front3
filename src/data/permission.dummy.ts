@@ -15,20 +15,20 @@ export type PermissionGroup = {
 };
 
 export const PERMISSION_MENUS: PermissionMenu[] = [
-  { id: 'm_dashboard',   label: '대시보드',      isDefault: true,  parentId: null },
-  { id: 'm_store',       label: '매장 관리',     isDefault: true,  parentId: null },
-  { id: 'm_statistics',  label: '통계/분석',     isDefault: false, parentId: null },
-  { id: 'm_stat_premium',label: '프리미엄 통계', isDefault: false, parentId: 'm_statistics' },
-  { id: 'm_settlement',  label: '정산 관리',     isDefault: false, parentId: null },
-  { id: 'm_tax',         label: '세금계산서',    isDefault: false, parentId: 'm_settlement' },
-  { id: 'm_api',         label: 'API 연동',      isDefault: false, parentId: null },
+  { id: 'm_dashboard', label: '대시보드', isDefault: true, parentId: null },
+  { id: 'm_store', label: '매장 관리', isDefault: true, parentId: null },
+  { id: 'm_statistics', label: '통계/분석', isDefault: false, parentId: null },
+  { id: 'm_stat_premium', label: '프리미엄 통계', isDefault: false, parentId: 'm_statistics' },
+  { id: 'm_settlement', label: '정산 관리', isDefault: false, parentId: null },
+  { id: 'm_tax', label: '세금계산서', isDefault: false, parentId: 'm_settlement' },
+  { id: 'm_api', label: 'API 연동', isDefault: false, parentId: null },
 ];
 
 export const DUMMY_PERMISSION_GROUPS: PermissionGroup[] = [
   {
     id: 'g_basic',
     name: '기본 그룹',
-    description: '모든 테넌트에 기본 제공되는 필수 메뉴 그룹입니다.',
+    description: '모든 프랜차이즈에 기본 제공되는 필수 메뉴 그룹입니다.',
     menuIds: ['m_dashboard', 'm_store'],
     isSystem: true,
     createdAt: '2025-01-01',

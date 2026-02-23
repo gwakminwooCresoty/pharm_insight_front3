@@ -5,7 +5,7 @@ import { DUMMY_ACCOUNTS } from '@/data/auth.dummy';
 import { BRANDING } from '@/data/branding.dummy';
 
 // PLATFORM_ADMIN은 /platform/login에서 별도 인증
-const TENANT_ACCOUNTS = DUMMY_ACCOUNTS.filter((a) => a.role !== 'PLATFORM_ADMIN');
+const FRANCHISE_ACCOUNTS = DUMMY_ACCOUNTS.filter((a) => a.role !== 'PLATFORM_ADMIN');
 
 function PharmLogo({ size = 28 }: { size?: number }) {
   return (
@@ -42,7 +42,7 @@ export default function LoginPage() {
   }
 
   function handleQuickLogin(userId: string) {
-    const account = TENANT_ACCOUNTS.find((a) => a.userId === userId);
+    const account = FRANCHISE_ACCOUNTS.find((a) => a.userId === userId);
     if (account) {
       setEmail(account.email);
       setPassword(account.password);
@@ -114,7 +114,7 @@ export default function LoginPage() {
               데모 계정 빠른 선택
             </p>
             <div className="grid grid-cols-2 gap-1.5">
-              {TENANT_ACCOUNTS.map((account) => (
+              {FRANCHISE_ACCOUNTS.map((account) => (
                 <button
                   key={account.userId}
                   type="button"
