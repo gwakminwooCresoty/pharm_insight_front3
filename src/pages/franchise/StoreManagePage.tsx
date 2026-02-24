@@ -53,13 +53,22 @@ export default function StoreManagePage() {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value)}
-                                className="w-full ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
+                                className="flex-1 ring-1 ring-slate-200 rounded-[var(--radius-button)] px-3 py-2 text-sm bg-white hover:ring-slate-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary-500/40 transition-all"
                             >
                                 <option value="">전체 상태</option>
                                 <option value="ACTIVE">운영중</option>
                                 <option value="CLOSED">폐점</option>
                             </select>
-                            <Button onClick={() => setKeyword('')} variant="secondary">초기화</Button>
+                            <Button
+                                onClick={() => {
+                                    setKeyword('');
+                                    setStatusFilter('');
+                                }}
+                                variant="secondary"
+                                className="shrink-0 whitespace-nowrap"
+                            >
+                                초기화
+                            </Button>
                         </div>
                     </div>
 
